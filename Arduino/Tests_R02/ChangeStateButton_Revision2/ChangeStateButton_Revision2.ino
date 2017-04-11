@@ -41,41 +41,59 @@ int RELAY11 = 51;
 int RELAY12 = 53;
 
 bool PoolPump = false;
+bool FloorPump = false;
+bool ConvPump = false;
+bool FloorConvPump = false;
 bool BoilerSource = false;
 bool BoilerState = false;
-bool HeaterState = false;
+bool HeatingSource = false;
+bool HeatingState = false;
 
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 
  */
-NexPage page0    = NexPage(0, 0, "page0");
-NexPage page1    = NexPage(1, 0, "page1");
-NexPage page5    = NexPage(5, 0, "page5");
+NexPage page0 = NexPage(0, 0, "page0");
+NexPage page1 = NexPage(1, 0, "page1");
+NexPage page2 = NexPage(2, 0, "page2");
+NexPage page5 = NexPage(5, 0, "page5");
 
 NexCrop buttonPoolPump = NexCrop(0, 10, "PoolPump");
-NexCrop buttonBoilerSource = NexCrop(1, 11, "Source"); // Crop on Page 1 For source pic swich
+NexCrop buttonBoilerSource = NexCrop(1, 11, "BSource"); // Crop on Page 1 For source pic swich
+NexCrop buttonHeatingSource = NexCrop(5, 2, "HSource"); // Crop on Page 5 for source pic swich
 NexCrop buttonBoilerSwichC = NexCrop(0, 11, "BoilerSwichC");
-NexCrop buttonHeaterSwichC = NexCrop(0, 12, "HeaterSwichC");
+NexCrop buttonHeatingSwichC = NexCrop(0, 12, "HeatingSwichC");
+NexCrop buttonFloorPump = NexCrop(5, 9, "FloorPump");
+NexCrop buttonConvPump = NexCrop(5, 10, "ConvPump");
+NexCrop buttonFloorConvPump = NexCrop(5, 11, "FloorConvPump");
 NexButton buttonBoiler = NexButton(0, 8, "BoilerM");
-NexButton buttonHeater = NexButton(0, 9, "HeaterM");
-NexButton buttonBSourceK = NexButton(1, 12, "SourceK");
-NexButton buttonBSourceH = NexButton(1, 13, "SourceH");
+NexButton buttonHeating = NexButton(0, 9, "HeatingM"); 
+NexButton buttonBSourceK = NexButton(1, 12, "BSourceK");
+NexButton buttonBSourceH = NexButton(1, 13, "BSourceH");
+NexButton buttonHSourceK = NexButton(5, 4, "HSourceK");
+NexButton buttonHSourceHP = NexButton(5, 5, "HSourceHP");
 NexButton buttonBackB = NexButton(1, 2, "Back");
-NexButton buttonBackH = NexButton(5, 2, "Back");
+NexButton buttonBackS = NexButton(2, 4, "Back");
+NexButton buttonBackH = NexButton(5, 3, "Back");
 
 /*
  * REGISTER NEXTION objects to the touch event list.
  */
 NexTouch *nex_listen_list[] =
 {
-  &buttonPoolPump,
   &buttonBoilerSwichC,
-  &buttonHeaterSwichC,
+  &buttonHeatingSwichC,
+  &buttonPoolPump,
+  &buttonFloorPump,
+  &buttonConvPump,
+  &buttonFloorConvPump,
   &buttonBoiler,
-  &buttonHeater,
+  &buttonHeating, 
   &buttonBSourceK,
   &buttonBSourceH,
+  &buttonHSourceK,
+  &buttonHSourceHP,
   &buttonBackB,
+  &buttonBackS,
   &buttonBackH,
   NULL
 };
@@ -90,7 +108,22 @@ void Pic_Update(bool state, NexCrop button, int pageOn, int pageOff){
   button.setPic(var);
 }
 
-void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){
+void UpdateSingleRelays(bool state, bool master, int relay1){  //Update Relay Function
+  if(master){
+    if(state == true){
+      digitalWrite(relay1, LOW);
+      //Serial.println("RELAY6 ON");
+    }
+    if(state == false){
+      digitalWrite(relay1, HIGH);
+      //Serial.println("RELAY6 OFF");
+    }
+  } else {
+    digitalWrite(relay1, HIGH);
+  }
+}
+
+void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){ //BOILER SOURCE
   if(master){
     if(state){
       digitalWrite(relay1, LOW);
@@ -109,41 +142,34 @@ void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){
   }
 }
 
-void UpdateSingleRelays(bool state, int relay1){
-  if(PoolPump == true){
-    digitalWrite(relay1, LOW);
-    //Serial.println("RELAY6 ON");
-  }
-  if(PoolPump == false){
-    digitalWrite(relay1, HIGH);
-    //Serial.println("RELAY6 OFF");
-  }
-}
-
 /*
    BUTTONS component callback function.
 */ 
 
 //PAGE CHANGING
-void buttonBoilerPushCallback(void *ptr)
+void buttonBoilerPushCallback(void *ptr)  //GO TO PAGE BOILER
 {
   dbSerialPrintln("buttonBoilerPushCallback");
   page1.show();
-  Pic_Update(BoilerSource, buttonBoilerSource, 6, 5);
+  Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
 }
 
-void buttonHeaterPushCallback(void *ptr)
+void buttonHeatingPushCallback(void *ptr)  //GO TO PAGE HEATING
 {
-  dbSerialPrintln("buttonHeaterPushCallback");
+  dbSerialPrintln("buttonHeatingPushCallback");
   page5.show();
+  Pic_Update(HeatingSource, buttonHeatingSource, 8, 5);
+  Pic_Update(FloorPump, buttonFloorPump, 8, 5);
+  Pic_Update(ConvPump, buttonConvPump, 8, 5);
+  Pic_Update(FloorConvPump, buttonFloorConvPump, 8, 5);
 }
 
-void buttonBack0PushCallback(void *ptr){
+void buttonBack0PushCallback(void *ptr){  //GO BACK TO HOME PAGE
   dbSerialPrintln("Back to page 0");
   page0.show();
   Pic_Update(PoolPump, buttonPoolPump, 7, 2);
   Pic_Update(BoilerState, buttonBoilerSwichC, 7, 2);
-  Pic_Update(HeaterState, buttonHeaterSwichC, 7, 2);
+  Pic_Update(HeatingState, buttonHeatingSwichC, 7, 2);
 }
 
 //LOGISTIC FUNCTIONS
@@ -153,47 +179,102 @@ void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
   
   dbSerialPrint("Boiler Swich");
   dbSerialPrint(BoilerState);
+  
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
   Pic_Update(BoilerState, buttonBoilerSwichC, 7, 2);
 }
 
-void buttonHeaterSwichCPushCallBack(void *ptr){ //HEATER ON OFF
-  if(HeaterState)HeaterState = false;
-  else HeaterState = true;
-  dbSerialPrint("Heater Swich");
-  dbSerialPrint(HeaterState);
-  Pic_Update(HeaterState, buttonHeaterSwichC, 7, 2);
+void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF 
+  if(HeatingState)HeatingState = false;
+  else HeatingState = true;
+  
+  dbSerialPrint("Heating Swich");
+  dbSerialPrint(HeatingState);
+
+  UpdateSingleRelays(FloorPump, HeatingState, RELAY3);
+  UpdateSingleRelays(ConvPump, HeatingState, RELAY4);
+  UpdateSingleRelays(FloorConvPump, HeatingState, RELAY5);
+  UpdateDoubleRelays(HeatingSource, HeatingState, RELAY7, RELAY8);
+  Pic_Update(HeatingState, buttonHeatingSwichC, 7, 2);
 }
 
-void buttonBoilerSourceKSwapPushCallBack(void *ptr){
+void buttonBoilerSourceKSwapPushCallBack(void *ptr){   //BOILER SOURCE
   dbSerialPrintln("Boiler Source Swap to Kotel");
 
   BoilerSource = true;
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
-  Pic_Update(BoilerSource, buttonBoilerSource, 6, 5);
+  Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
 }
 
-void buttonBoilerSourceHSwapPushCallBack(void *ptr){
+void buttonBoilerSourceHSwapPushCallBack(void *ptr){    //BOILER SOURCE
   dbSerialPrintln("Boiler Source Swap to Heater");
 
   BoilerSource = false;
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
-  Pic_Update(BoilerSource, buttonBoilerSource, 6, 5);
+  Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
 }
 
-void buttonPoolPumpPushCallback(void *ptr)
+void buttonHeatingSourceKSwapPushCallBack(void *ptr){   //HEATING SOURCE
+  dbSerialPrintln("Heating Source Swap to Kotel");
+
+  HeatingSource = true;
+  UpdateDoubleRelays(HeatingSource, HeatingState, RELAY7, RELAY8);
+  Pic_Update(HeatingSource, buttonHeatingSource, 8, 5);
+}
+
+void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
+  dbSerialPrintln("Boiler Source Swap to El Pompa");
+
+  HeatingSource = false;
+  UpdateDoubleRelays(HeatingSource, HeatingState, RELAY7, RELAY8);
+  Pic_Update(HeatingSource, buttonHeatingSource, 8, 5);
+}
+
+void buttonPoolPumpPushCallback(void *ptr)   //POOL PUMP ON OFF
 {
   dbSerialPrintln("PoolPumpPopCallback");
   
   if(PoolPump)PoolPump = false;
   else PoolPump = true;
 
-  UpdateSingleRelays(PoolPump, RELAY6);
+  UpdateSingleRelays(PoolPump, 1, RELAY6);
 
   Pic_Update(PoolPump, buttonPoolPump, 7, 2);
   
 }
 
+void buttonFloorPumpPushCallback(void *ptr)   //FLOOR PUMP ON OFF
+{
+  dbSerialPrintln("FloorPumpPopCallback");
+  
+  if(FloorPump)FloorPump = false;
+  else FloorPump = true;
+
+  UpdateSingleRelays(FloorPump, HeatingState, RELAY3);
+  Pic_Update(FloorPump, buttonFloorPump, 8, 5);
+}
+
+void buttonConvPumpPushCallback(void *ptr)    //CONV PUMP ON OFF
+{
+  dbSerialPrintln("ConvPumpPopCallback");
+  
+  if(ConvPump)ConvPump = false;
+  else ConvPump = true;
+
+  UpdateSingleRelays(ConvPump, HeatingState, RELAY4);
+  Pic_Update(ConvPump, buttonConvPump, 8, 5);
+}
+
+void buttonFloorConvPumpPushCallback(void *ptr)   //FLOOR CONV PUMP ON OFF
+{
+  dbSerialPrintln("FloorConvPopCallback");
+  
+  if(FloorConvPump)FloorConvPump = false;
+  else FloorConvPump = true;
+
+  UpdateSingleRelays(FloorConvPump, HeatingState, RELAY5);
+  Pic_Update(FloorConvPump, buttonFloorConvPump, 8, 5);
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -235,17 +316,29 @@ void setup() {
   Serial.println("Serial start");
 
   /*
-   *Register the pop event callback function of the current button0 component. 
+   *Register the pop event callback function of the current component. 
    */
-  buttonPoolPump.attachPush(buttonPoolPumpPushCallback);
   buttonBoilerSwichC.attachPush(buttonBoilerSwichCPushCallBack);
-  buttonHeaterSwichC.attachPush(buttonHeaterSwichCPushCallBack);
+  buttonHeatingSwichC.attachPush(buttonHeatingSwichCPushCallBack);
+
+  buttonPoolPump.attachPush(buttonPoolPumpPushCallback);
+  buttonFloorPump.attachPush(buttonFloorPumpPushCallback);
+  buttonConvPump.attachPush(buttonConvPumpPushCallback);
+  buttonFloorConvPump.attachPush(buttonFloorConvPumpPushCallback);
+  
   buttonBoiler.attachPush(buttonBoilerPushCallback);
-  buttonHeater.attachPush(buttonHeaterPushCallback);
+  buttonHeating.attachPush(buttonHeatingPushCallback);
+  
   buttonBSourceK.attachPush(buttonBoilerSourceKSwapPushCallBack);
   buttonBSourceH.attachPush(buttonBoilerSourceHSwapPushCallBack);
+  
+  buttonHSourceK.attachPush(buttonHeatingSourceKSwapPushCallBack);
+  buttonHSourceHP.attachPush(buttonHeatingSourceHPSwapPushCallBack);
+  
   buttonBackB.attachPush(buttonBack0PushCallback);
+  buttonBackS.attachPush(buttonBack0PushCallback);
   buttonBackH.attachPush(buttonBack0PushCallback);
+  
   dbSerialPrintln("Setup done");
   
 }
