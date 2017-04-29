@@ -24,6 +24,10 @@
 #include <NexUpload.h>
 #include <NexVariable.h>
 #include <NexWaveform.h>
+//#include <EEPROM.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+//#include <LiquidCrystal.h>
 /*
  * DEFINE INPUTS/OUTPUTS 
  */
@@ -40,6 +44,8 @@ int RELAY10 = 49;
 int RELAY11 = 51;
 int RELAY12 = 53;
 
+int BTemp = 0;
+
 bool PoolPump = false;
 bool FloorPump = false;
 bool ConvPump = false;
@@ -53,11 +59,16 @@ bool Priority = false;
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 
  */
+OneWire BSensor(A0);
+
+DallasTemperature BSensors(&BSensor);
+
 NexPage page0 = NexPage(0, 0, "page0");
 NexPage page1 = NexPage(1, 0, "page1");
 NexPage page2 = NexPage(2, 0, "page2");
 NexPage page5 = NexPage(5, 0, "page5");
 
+NexNumber BTempN = NexNumber(0, 6, "BTemp");
 NexCrop buttonPoolPump = NexCrop(0, 10, "PoolPump");
 NexCrop buttonBoilerSource = NexCrop(1, 10, "BSource"); // Crop on Page 1 For source pic swich
 NexCrop buttonHeatingSource = NexCrop(5, 2, "HSource"); // Crop on Page 5 for source pic swich
@@ -76,6 +87,8 @@ NexButton buttonHSourceHP = NexButton(5, 5, "HSourceHP");
 NexButton buttonBackB = NexButton(1, 2, "Back");
 NexButton buttonBackS = NexButton(2, 4, "Back");
 NexButton buttonBackH = NexButton(5, 3, "Back");
+
+
 
 /*
  * REGISTER NEXTION objects to the touch event list.
@@ -104,6 +117,14 @@ NexTouch *nex_listen_list[] =
 /*
    BUTTONS PAGES update function.
 */ 
+void TempUpdate(){
+  dbSerialPrintln("Temp rec");
+  BSensors.requestTemperatures();
+  dbSerialPrintln("DONE");
+  //BTemp = Bsensors.getTempCByIndex(0);
+  BTempN.setValue(BSensors.getTempCByIndex(0));
+}
+
 void Pic_Update(bool state, NexCrop button, int pageOn, int pageOff){
   uint32_t var;
   if(state)var = pageOn;
@@ -390,6 +411,7 @@ void setup() {
   nexInit();
   
   Serial.begin(115200);
+  BSensors.begin();
 
   Serial.println("Serial start");
 
@@ -426,6 +448,8 @@ void loop() {
   
   // put your main code here, to run repeatedly:
   nexLoop(nex_listen_list);
+  //dbSerialPrintln("Error?");
+  TempUpdate();
 }
  
   
