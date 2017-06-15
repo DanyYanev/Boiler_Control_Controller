@@ -1,3 +1,4 @@
+#include <EEPROM.h>
 #include <doxygen.h>
 #include <NexButton.h>
 #include <NexCheckbox.h>
@@ -33,6 +34,20 @@
 /*
  * DEFINE INPUTS/OUTPUTS 
  */
+#define POOL_PUMP_EE 0
+#define FLOOR_PUMP_EE 1
+#define CONV_PUMP_EE 2
+#define FLOOR_CONV_PUMP_EE 3
+#define BOILER_SOURCE_EE 4
+#define BOILER_STATE_EE 5
+#define HEATING_SOURCE_EE 6
+#define HEATING_STATE_EE 7
+#define PRIORITY_EE 8
+#define BTEMP_EE 10
+#define BTEMP_SET_EE 32
+#define BHIST_SET_EE 74
+#define HTEMP_SET_EE 106
+ 
 int RELAY1 = 31;
 int RELAY2 = 33;
 int RELAY3 = 35;
@@ -46,21 +61,21 @@ int RELAY10 = 49;
 int RELAY11 = 51;
 int RELAY12 = 53;
 
-uint32_t BTemp = 0;
-uint32_t BTempSet = 0;
-uint32_t BHistSet = 0;
-uint32_t HTempSet = 0;
+uint32_t BTemp = EEPROM.get(BTEMP_EE, uint32_t);
+uint32_t BTempSet = EEPROM.get(BTEMP_SET_EE, uint32_t);
+uint32_t BHistSet = EEPROM.get(BHIST_SET_EE, uint32_t);
+uint32_t HTempSet = EEPROM.get(HTEMP_SET_EE, uint32_t);
 int i = 0;
 
-bool PoolPump = false;
-bool FloorPump = false;
-bool ConvPump = false;
-bool FloorConvPump = false;
-bool BoilerSource = false;
-bool BoilerState = false;
-bool HeatingSource = false;
-bool HeatingState = false;
-bool Priority = false;
+bool PoolPump = EEPROM.get(POOL_PUMP_EE, bool);
+bool FloorPump = EEPROM.get(FLOOR_PUMP_EE, bool);
+bool ConvPump = EEPROM.get(CONV_PUMP_EE, bool);
+bool FloorConvPump = EEPROM.get(FLOOR_CONV_PUMP_EE, bool);
+bool BoilerSource = EEPROM.get(BOILER_SOURCE_EE, bool);
+bool BoilerState = EEPROM.get(BOILER_STATE_EE, bool);
+bool HeatingSource = EEPROM.get(HEATING_SOURCE_EE, bool);
+bool HeatingState = EEPROM.get(HEATING_STATE_EE, bool);
+bool Priority = EEPROM.get(PRIORITY_EE, bool);
 
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 

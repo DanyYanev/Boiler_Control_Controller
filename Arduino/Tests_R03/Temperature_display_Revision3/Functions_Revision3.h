@@ -1,5 +1,5 @@
 #pragma once
-
+#include <EEPROM.h>
 #include<iostream>
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -159,6 +159,7 @@ void buttonBack0PushCallback(void *ptr){  //GO BACK TO HOME PAGE
 void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
   if(BoilerState)BoilerState = false;
   else BoilerState = true;
+  EEPROM.put(BOILER_STATE_EE, BoilerState);
   
   dbSerialPrint("Boiler Swich");
   dbSerialPrint(BoilerState);
@@ -171,6 +172,7 @@ void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
 void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF 
   if(HeatingState)HeatingState = false;
   else HeatingState = true;
+  EEPROM.put(HEATING_STATE_EE, HeatingState);
   
   dbSerialPrint("Heating Swich");
   dbSerialPrint(HeatingState);
@@ -185,6 +187,7 @@ void buttonPriorityPushCallBack(void *ptr){
 
   if(Priority) Priority = false;
   else Priority = true;
+  EEPROM.put(PRIORITY_EE, Priority);
 
   UpdatePriority();
   
@@ -195,6 +198,7 @@ void buttonBTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
   
   BTempSet++;
+  EEPROM.put(BTEMP_SET_EE, BTempSet);
   BTempSetN.setValue(BTempSet);
 }
 
@@ -202,6 +206,7 @@ void buttonBTempDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempDownPushCallBack");
   
   BTempSet--;
+  EEPROM.put(BTEMP_SET_EE, BTempSet);
   BTempSetN.setValue(BTempSet);
 }
  
@@ -209,6 +214,7 @@ void buttonBHistUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBHistUpPushCallBack");
   
   BHistSet++;
+  EEPROM.put(BHIST_SET_EE, BHistSet);
   BHistSetN.setValue(BHistSet);
 }
   
@@ -216,6 +222,7 @@ void buttonBHistDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBHistDownPushCallBack");
   
   BHistSet--;
+  EEPROM.put(BHIST_SET_EE, BHistSet);
   BHistSetN.setValue(BHistSet);
 }
 
@@ -223,6 +230,7 @@ void buttonHTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
   
   HTempSet++;
+  EEPROM.put(HTEMP_SET_EE, HTempSet);
   HTempSetN.setValue(HTempSet);
 }
 
@@ -230,6 +238,7 @@ void buttonHTempDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempDownPushCallBack");
   
   HTempSet--;
+  EEPROM.put(HTEMP_SET_EE, HTempSet);
   HTempSetN.setValue(HTempSet);
 }
 
@@ -237,6 +246,7 @@ void buttonBoilerSourceKSwapPushCallBack(void *ptr){   //BOILER SOURCE
   dbSerialPrintln("Boiler Source Swap to Kotel");
 
   BoilerSource = true;
+  EEPROM.put(BOILER_SOURCE_EE, BoilerSource);
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
   
   UpdatePriority();
@@ -248,6 +258,7 @@ void buttonBoilerSourceHSwapPushCallBack(void *ptr){    //BOILER SOURCE
   dbSerialPrintln("Boiler Source Swap to Heater");
 
   BoilerSource = false;
+  EEPROM.put(BOILER_SOURCE_EE, BoilerSource);
   
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
   UpdatePriority();
@@ -259,6 +270,7 @@ void buttonHeatingSourceKSwapPushCallBack(void *ptr){   //HEATING SOURCE
   dbSerialPrintln("Heating Source Swap to Kotel");
 
   HeatingSource = true;
+  EEPROM.put(HEATING_SOURCE_EE, HeatingSource);
   
   UpdatePriority();
   
@@ -269,6 +281,7 @@ void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
   dbSerialPrintln("Boiler Source Swap to El Pompa");
 
   HeatingSource = false;
+  EEPROM.put(HEATING_SOURCE_EE, HeatingSource);
   
   UpdatePriority();
   
@@ -281,6 +294,7 @@ void buttonPoolPumpPushCallback(void *ptr)   //POOL PUMP ON OFF
   
   if(PoolPump)PoolPump = false;
   else PoolPump = true;
+  EEPROM.put(POOL_PUMP_EE, PoolPump);
 
   UpdateSingleRelays(PoolPump, 1, RELAY6);
   UpdateSourceK();
@@ -295,6 +309,7 @@ void buttonFloorPumpPushCallback(void *ptr)   //FLOOR PUMP ON OFF
   
   if(FloorPump)FloorPump = false;
   else FloorPump = true;
+  EEPROM.put(FLOOR_PUMP_EE, FloorPump);
   
   UpdatePriority();
   
@@ -307,6 +322,7 @@ void buttonConvPumpPushCallback(void *ptr)    //CONV PUMP ON OFF
   
   if(ConvPump)ConvPump = false;
   else ConvPump = true;
+  EEPROM.put(CONV_PUMP_EE, ConvPump);
   
   UpdatePriority();
 
@@ -319,6 +335,7 @@ void buttonFloorConvPumpPushCallback(void *ptr)   //FLOOR CONV PUMP ON OFF
   
   if(FloorConvPump)FloorConvPump = false;
   else FloorConvPump = true;
+  EEPROM.put(FLOOR_CONV_PUMP_EE, FloorConvPump);
   
   UpdatePriority();
   
