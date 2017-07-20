@@ -61,21 +61,20 @@ int RELAY10 = 49;
 int RELAY11 = 51;
 int RELAY12 = 53;
 
-uint32_t BTemp = EEPROM.get(BTEMP_EE, uint32_t);
-uint32_t BTempSet = EEPROM.get(BTEMP_SET_EE, uint32_t);
-uint32_t BHistSet = EEPROM.get(BHIST_SET_EE, uint32_t);
-uint32_t HTempSet = EEPROM.get(HTEMP_SET_EE, uint32_t);
-int i = 0;
+uint32_t BTemp;
+uint32_t BTempSet;
+uint32_t BHistSet;
+uint32_t HTempSet;
 
-bool PoolPump = EEPROM.get(POOL_PUMP_EE, bool);
-bool FloorPump = EEPROM.get(FLOOR_PUMP_EE, bool);
-bool ConvPump = EEPROM.get(CONV_PUMP_EE, bool);
-bool FloorConvPump = EEPROM.get(FLOOR_CONV_PUMP_EE, bool);
-bool BoilerSource = EEPROM.get(BOILER_SOURCE_EE, bool);
-bool BoilerState = EEPROM.get(BOILER_STATE_EE, bool);
-bool HeatingSource = EEPROM.get(HEATING_SOURCE_EE, bool);
-bool HeatingState = EEPROM.get(HEATING_STATE_EE, bool);
-bool Priority = EEPROM.get(PRIORITY_EE, bool);
+bool PoolPump;
+bool FloorPump;
+bool ConvPump;
+bool FloorConvPump;
+bool BoilerSource;
+bool BoilerState;
+bool HeatingSource;
+bool HeatingState;
+bool Priority;
 
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 
@@ -192,7 +191,22 @@ void setup() {
   digitalWrite(RELAY11, HIGH);
   digitalWrite(RELAY12, HIGH);
   nexInit();
-  
+
+  EEPROM.get(BTEMP_EE, BTemp);
+  EEPROM.get(BTEMP_SET_EE, BTempSet);
+  EEPROM.get(BHIST_SET_EE, BHistSet);
+  EEPROM.get(HTEMP_SET_EE, HTempSet);
+
+  EEPROM.get(POOL_PUMP_EE, PoolPump);
+  EEPROM.get(FLOOR_PUMP_EE, FloorPump);
+  EEPROM.get(CONV_PUMP_EE, ConvPump);
+  EEPROM.get(FLOOR_CONV_PUMP_EE, FloorConvPump);
+  EEPROM.get(BOILER_SOURCE_EE, BoilerSource);
+  EEPROM.get(BOILER_STATE_EE, BoilerState);
+  EEPROM.get(HEATING_SOURCE_EE, HeatingSource);
+  EEPROM.get(HEATING_STATE_EE, HeatingState);
+  EEPROM.get(PRIORITY_EE, Priority);
+
   Serial.begin(115200);
   BSensors.begin();
 
@@ -230,7 +244,9 @@ void setup() {
   buttonBackH.attachPush(buttonBack0PushCallback);
   
   dbSerialPrintln("Setup done");
-  TempUpdate();
+  //TempUpdate();
+  buttonBack0PushCallback(NULL); //TempUpdate inside
+  
 }
 
 void loop() {

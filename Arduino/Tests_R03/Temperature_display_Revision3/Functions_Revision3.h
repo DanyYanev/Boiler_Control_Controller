@@ -1,6 +1,5 @@
 #pragma once
 #include <EEPROM.h>
-#include<iostream>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <doxygen.h>
@@ -30,14 +29,89 @@
 #include <NexVariable.h>
 #include <NexWaveform.h>
 
-void TempUpdate(){
+#define POOL_PUMP_EE 0
+#define FLOOR_PUMP_EE 1
+#define CONV_PUMP_EE 2
+#define FLOOR_CONV_PUMP_EE 3
+#define BOILER_SOURCE_EE 4
+#define BOILER_STATE_EE 5
+#define HEATING_SOURCE_EE 6
+#define HEATING_STATE_EE 7
+#define PRIORITY_EE 8
+#define BTEMP_EE 10
+#define BTEMP_SET_EE 32
+#define BHIST_SET_EE 74
+#define HTEMP_SET_EE 106
  
-  //dbSerialPrintln("IN");
-  BSensors.requestTemperatures();
-  BTemp = BSensors.getTempCByIndex(0);
-  BTempN.setValue(BTemp);
-  
-}
+extern int RELAY1;
+extern int RELAY2;
+extern int RELAY3;
+extern int RELAY4;
+extern int RELAY5;
+extern int RELAY6;
+extern int RELAY7;
+extern int RELAY8;
+extern int RELAY9;
+extern int RELAY10;
+extern int RELAY11;
+extern int RELAY12;
+
+extern uint32_t BTemp;
+extern uint32_t BTempSet;
+extern uint32_t BHistSet;
+extern uint32_t HTempSet;
+
+extern bool PoolPump;
+extern bool FloorPump;
+extern bool ConvPump;
+extern bool FloorConvPump;
+extern bool BoilerSource;
+extern bool BoilerState;
+extern bool HeatingSource;
+extern bool HeatingState;
+extern bool Priority;
+
+
+extern OneWire BSensor;
+
+extern DallasTemperature BSensors;
+
+extern NexPage page0;
+extern NexPage page1;
+extern NexPage page2;
+extern NexPage page5;
+
+extern NexNumber BTempN;
+extern NexNumber BTempSetN;
+extern NexNumber BHistSetN;
+extern NexNumber HTempSetN;
+
+extern NexCrop buttonPoolPump;
+extern NexCrop buttonBoilerSource; // Crop on Page 1 For source pic swich
+extern NexCrop buttonHeatingSource; // Crop on Page 5 for source pic swich
+extern NexCrop buttonBoilerSwichC;
+extern NexCrop buttonHeatingSwichC;
+extern NexCrop buttonPriority;
+extern NexCrop buttonFloorPump;
+extern NexCrop buttonConvPump;
+extern NexCrop buttonFloorConvPump;
+
+extern NexCrop buttonBTempUp;
+extern NexCrop buttonBTempDown;
+extern NexCrop buttonBHistUp;
+extern NexCrop buttonBHistDown;
+extern NexCrop buttonHTempUp;
+extern NexCrop buttonHTempDown;
+
+extern NexButton buttonBoiler;
+extern NexButton buttonHeating;
+extern NexButton buttonBSourceK;
+extern NexButton buttonBSourceH;
+extern NexButton buttonHSourceK;
+extern NexButton buttonHSourceHP;
+extern NexButton buttonBackB;
+extern NexButton buttonBackS;
+extern NexButton buttonBackH;
 
 void Pic_Update(bool state, NexCrop button, int pageOn, int pageOff){
   uint32_t var;
@@ -123,6 +197,17 @@ void UpdatePriority(){
   }
 }
 
+void TempUpdate(){
+ 
+  //dbSerialPrintln("IN");
+  BSensors.requestTemperatures();
+  BTemp = BSensors.getTempCByIndex(0);
+  BTempN.setValue(BTemp);
+  if(BTemp > (BTempSet - BHistSet) && BoilerState){
+    BoilerState = false;
+    UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+  }
+}
 /*
    BUTTONS component callback function.
 */ 
@@ -134,6 +219,8 @@ void buttonBoilerPushCallback(void *ptr)  //GO TO PAGE BOILER
   page1.show();
   Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
   Pic_Update(Priority, buttonPriority, 6, 4);
+  BTempSetN.setValue(BTempSet);
+  BHistSetN.setValue(BHistSet);
 }
 
 void buttonHeatingPushCallback(void *ptr)  //GO TO PAGE HEATING
@@ -144,6 +231,7 @@ void buttonHeatingPushCallback(void *ptr)  //GO TO PAGE HEATING
   Pic_Update(FloorPump, buttonFloorPump, 8, 5);
   Pic_Update(ConvPump, buttonConvPump, 8, 5);
   Pic_Update(FloorConvPump, buttonFloorConvPump, 8, 5);
+  HTempSetN.setValue(HTempSet);
 }
 
 void buttonBack0PushCallback(void *ptr){  //GO BACK TO HOME PAGE
@@ -196,50 +284,58 @@ void buttonPriorityPushCallBack(void *ptr){
 
 void buttonBTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
-  
-  BTempSet++;
-  EEPROM.put(BTEMP_SET_EE, BTempSet);
-  BTempSetN.setValue(BTempSet);
+
+  if(BTempSet < 90){
+    BTempSet++;
+    EEPROM.put(BTEMP_SET_EE, BTempSet);
+    BTempSetN.setValue(BTempSet);
+  }
 }
 
 void buttonBTempDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempDownPushCallBack");
-  
-  BTempSet--;
-  EEPROM.put(BTEMP_SET_EE, BTempSet);
-  BTempSetN.setValue(BTempSet);
+
+  if(BTempSet > 40){
+    BTempSet--;
+    EEPROM.put(BTEMP_SET_EE, BTempSet);
+    BTempSetN.setValue(BTempSet);
+  }
 }
  
 void buttonBHistUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBHistUpPushCallBack");
   
-  BHistSet++;
-  EEPROM.put(BHIST_SET_EE, BHistSet);
-  BHistSetN.setValue(BHistSet);
+  if(BHistSet < 30){
+    BHistSet++;
+    EEPROM.put(BHIST_SET_EE, BHistSet);
+    BHistSetN.setValue(BHistSet);
+  }
 }
   
 void buttonBHistDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBHistDownPushCallBack");
-  
-  BHistSet--;
-  EEPROM.put(BHIST_SET_EE, BHistSet);
-  BHistSetN.setValue(BHistSet);
+  if(BHistSet > 2){
+    BHistSet--;
+    EEPROM.put(BHIST_SET_EE, BHistSet);
+    BHistSetN.setValue(BHistSet);
+  }
 }
-
 void buttonHTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
-  
-  HTempSet++;
-  EEPROM.put(HTEMP_SET_EE, HTempSet);
-  HTempSetN.setValue(HTempSet);
+  if(HTempSet < 40){
+    HTempSet++;
+    EEPROM.put(HTEMP_SET_EE, HTempSet);
+    HTempSetN.setValue(HTempSet);
+  }
 }
 
 void buttonHTempDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempDownPushCallBack");
-  
-  HTempSet--;
-  EEPROM.put(HTEMP_SET_EE, HTempSet);
-  HTempSetN.setValue(HTempSet);
+  if(HTempSet > 30){
+    HTempSet--;
+    EEPROM.put(HTEMP_SET_EE, HTempSet);
+    HTempSetN.setValue(HTempSet);
+  }
 }
 
 void buttonBoilerSourceKSwapPushCallBack(void *ptr){   //BOILER SOURCE
