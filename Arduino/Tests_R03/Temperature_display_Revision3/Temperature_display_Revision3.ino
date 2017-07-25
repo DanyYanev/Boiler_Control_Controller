@@ -64,6 +64,7 @@ int RELAY12 = 53;
 uint32_t BTemp;
 uint32_t BTempSet;
 uint32_t BHistSet;
+uint32_t HTemp;
 uint32_t HTempSet;
 
 bool PoolPump;
@@ -72,8 +73,10 @@ bool ConvPump;
 bool FloorConvPump;
 bool BoilerSource;
 bool BoilerState;
+bool BoilerPic;
 bool HeatingSource;
 bool HeatingState;
+bool HeatingPic;
 bool Priority;
 
 /*
@@ -202,9 +205,9 @@ void setup() {
   EEPROM.get(CONV_PUMP_EE, ConvPump);
   EEPROM.get(FLOOR_CONV_PUMP_EE, FloorConvPump);
   EEPROM.get(BOILER_SOURCE_EE, BoilerSource);
-  EEPROM.get(BOILER_STATE_EE, BoilerState);
+  EEPROM.get(BOILER_STATE_EE, BoilerPic);
   EEPROM.get(HEATING_SOURCE_EE, HeatingSource);
-  EEPROM.get(HEATING_STATE_EE, HeatingState);
+  EEPROM.get(HEATING_STATE_EE, HeatingPic);
   EEPROM.get(PRIORITY_EE, Priority);
 
   Serial.begin(115200);

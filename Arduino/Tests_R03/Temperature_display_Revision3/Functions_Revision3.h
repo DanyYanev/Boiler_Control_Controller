@@ -59,6 +59,7 @@ extern int RELAY12;
 extern uint32_t BTemp;
 extern uint32_t BTempSet;
 extern uint32_t BHistSet;
+extern uint32_t HTemp;
 extern uint32_t HTempSet;
 
 extern bool PoolPump;
@@ -66,9 +67,11 @@ extern bool FloorPump;
 extern bool ConvPump;
 extern bool FloorConvPump;
 extern bool BoilerSource;
+extern bool BoilerPic;
 extern bool BoilerState;
 extern bool HeatingSource;
 extern bool HeatingState;
+extern bool HeatingPic;
 extern bool Priority;
 
 
@@ -156,6 +159,7 @@ void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){ //BOIL
 
 void UpdateSourceK(){
   bool K = false;
+  
   if(BoilerState){
     if(BoilerSource == 1) K = true;
   }
@@ -197,17 +201,41 @@ void UpdatePriority(){
   }
 }
 
+void UpdateLogistics(){
+  if(BoilerPic){
+    if(BTemp > (BTempSet - BHistSet)){
+      BoilerState = false;
+      UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+    } else {
+      BoilerState = true;
+      UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+    }
+  } else {
+    BoilerState = false;
+    UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+  }
+  /*
+  if(HeatingPic){
+    if(HTemp >= HTempSet){
+      HeatingState = false; 
+    } else {
+      HeatingState = true;
+    }
+  }
+  */
+  UpdatePriority();
+}
+
 void TempUpdate(){
  
   //dbSerialPrintln("IN");
   BSensors.requestTemperatures();
   BTemp = BSensors.getTempCByIndex(0);
   BTempN.setValue(BTemp);
-  if(BTemp > (BTempSet - BHistSet) && BoilerState){
-    BoilerState = false;
-    UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
-  }
+  UpdateLogistics();
 }
+
+
 /*
    BUTTONS component callback function.
 */ 
@@ -239,22 +267,22 @@ void buttonBack0PushCallback(void *ptr){  //GO BACK TO HOME PAGE
   page0.show();
   TempUpdate();
   Pic_Update(PoolPump, buttonPoolPump, 7, 2);
-  Pic_Update(BoilerState, buttonBoilerSwichC, 7, 2);
+  Pic_Update(BoilerPic, buttonBoilerSwichC, 7, 2);
   Pic_Update(HeatingState, buttonHeatingSwichC, 7, 2);
 }
 
 //LOGISTIC FUNCTIONS
 void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
-  if(BoilerState)BoilerState = false;
-  else BoilerState = true;
-  EEPROM.put(BOILER_STATE_EE, BoilerState);
+  if(BoilerPic)BoilerPic = false;
+  else BoilerPic = true;
+  EEPROM.put(BOILER_STATE_EE, BoilerPic);
   
   dbSerialPrint("Boiler Swich");
-  dbSerialPrint(BoilerState);
+  dbSerialPrint(BoilerPic);
   
-  UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
-  UpdatePriority();
-  Pic_Update(BoilerState, buttonBoilerSwichC, 7, 2);
+  UpdateLogistics();
+  //UpdatePriority();
+  Pic_Update(BoilerPic, buttonBoilerSwichC, 7, 2);
 }
 
 void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF 
@@ -265,8 +293,8 @@ void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF
   dbSerialPrint("Heating Swich");
   dbSerialPrint(HeatingState);
   
-  UpdatePriority();
-  
+  //UpdatePriority();
+  UpdateLogistics();
   Pic_Update(HeatingState, buttonHeatingSwichC, 7, 2);
 }
 
