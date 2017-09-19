@@ -246,7 +246,7 @@ void setup() {
   buttonBackS.attachPush(buttonBack0PushCallback);
   buttonBackH.attachPush(buttonBack0PushCallback);
   
-  dbSerialPrintln("Setup done");
+  Serial.println("Setup done");
   //TempUpdate();
   buttonBack0PushCallback(NULL); //TempUpdate inside
   
