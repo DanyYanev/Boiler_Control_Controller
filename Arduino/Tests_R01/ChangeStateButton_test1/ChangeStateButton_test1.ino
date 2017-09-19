@@ -62,8 +62,7 @@ NexTouch *nex_listen_list[] =
   &buttonPoolPump,
   &buttonBoiler,
   &buttonHeater,
-  &buttonBSourceK,
-  &buttonBSourceK,
+  //&buttonBSourceK,
   &buttonBackB,
   &buttonBackH,
   NULL
