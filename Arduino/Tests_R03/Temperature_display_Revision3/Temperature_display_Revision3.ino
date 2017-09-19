@@ -257,7 +257,7 @@ void loop() {
   
   if(millis() % 10000 == 0){
     TempUpdate();
-    Serial.println("asd");
+    Serial.println("Temp Update");
   }
   
   nexLoop(nex_listen_list);
