@@ -91,16 +91,16 @@ NexPage page1 = NexPage(1, 0, "page1");
 NexPage page2 = NexPage(2, 0, "page2");
 NexPage page5 = NexPage(5, 0, "page5");
 
-NexNumber BTempN = NexNumber(0, 6, "BTemp");
+NexNumber BTempN = NexNumber(0, 4, "BTemp");
 NexNumber BTempSetN = NexNumber(1, 4, "BTempSet");
 NexNumber BHistSetN = NexNumber(1, 3, "BHistSet");
 NexNumber HTempSetN = NexNumber(5, 6, "HTempSet");
 
-NexCrop buttonPoolPump = NexCrop(0, 10, "PoolPump");
+NexCrop buttonPoolPump = NexCrop(0, 8, "PoolPump");
 NexCrop buttonBoilerSource = NexCrop(1, 10, "BSource"); // Crop on Page 1 For source pic swich
 NexCrop buttonHeatingSource = NexCrop(5, 2, "HSource"); // Crop on Page 5 for source pic swich
-NexCrop buttonBoilerSwichC = NexCrop(0, 11, "BoilerSwichC");
-NexCrop buttonHeatingSwichC = NexCrop(0, 12, "HeatingSwichC");
+NexCrop buttonBoilerSwichC = NexCrop(0, 9, "BoilerSwichC");
+NexCrop buttonHeatingSwichC = NexCrop(0, 10, "HeatingSwichC");
 NexCrop buttonPriority = NexCrop(1, 9, "Priority");
 NexCrop buttonFloorPump = NexCrop(5, 9, "FloorPump");
 NexCrop buttonConvPump = NexCrop(5, 10, "ConvPump");
@@ -113,8 +113,8 @@ NexCrop buttonBHistDown = NexCrop(1, 7, "BHistDown");
 NexCrop buttonHTempUp = NexCrop(5, 8, "HTempUp");
 NexCrop buttonHTempDown = NexCrop(5, 7, "HTempDown");
 
-NexButton buttonBoiler = NexButton(0, 8, "BoilerM");
-NexButton buttonHeating = NexButton(0, 9, "HeatingM"); 
+NexButton buttonBoiler = NexButton(0, 6, "BoilerM");
+NexButton buttonHeating = NexButton(0, 7, "HeatingM"); 
 NexButton buttonBSourceK = NexButton(1, 11, "BSourceK");
 NexButton buttonBSourceH = NexButton(1, 12, "BSourceH");
 NexButton buttonHSourceK = NexButton(5, 4, "HSourceK");
