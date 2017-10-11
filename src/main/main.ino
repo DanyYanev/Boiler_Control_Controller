@@ -43,7 +43,6 @@
 #define HEATING_SOURCE_EE 6
 #define HEATING_STATE_EE 7
 #define PRIORITY_EE 8
-#define BTEMP_EE 10
 #define BTEMP_SET_EE 32
 #define BHIST_SET_EE 74
 #define HTEMP_SET_EE 106
@@ -67,6 +66,9 @@ uint32_t BHistSet;
 uint32_t HTemp;
 uint32_t HTempSet;
 
+int HState;
+int HTimeOut;
+
 bool PoolPump;
 bool FloorPump;
 bool ConvPump;
@@ -78,13 +80,16 @@ bool HeatingSource;
 bool HeatingState;
 bool HeatingPic;
 bool Priority;
+bool HInMotion;
 
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 
  */
 OneWire BSensor(A0);
+OneWire HSensor(A1);
 
 DallasTemperature BSensors(&BSensor);
+DallasTemperature HSensors(&HSensor);
 
 NexPage page0 = NexPage(0, 0, "page0");
 NexPage page1 = NexPage(1, 0, "page1");
@@ -92,6 +97,7 @@ NexPage page2 = NexPage(2, 0, "page2");
 NexPage page5 = NexPage(5, 0, "page5");
 
 NexNumber BTempN = NexNumber(0, 4, "BTemp");
+NexNumber HTempN = NexNumber(0, 5, "HTempN");
 NexNumber BTempSetN = NexNumber(1, 4, "BTempSet");
 NexNumber BHistSetN = NexNumber(1, 3, "BHistSet");
 NexNumber HTempSetN = NexNumber(5, 6, "HTempSet");
@@ -195,7 +201,6 @@ void setup() {
   digitalWrite(RELAY12, HIGH);
   nexInit();
 
-  EEPROM.get(BTEMP_EE, BTemp);
   EEPROM.get(BTEMP_SET_EE, BTempSet);
   EEPROM.get(BHIST_SET_EE, BHistSet);
   EEPROM.get(HTEMP_SET_EE, HTempSet);
@@ -210,8 +215,12 @@ void setup() {
   EEPROM.get(HEATING_STATE_EE, HeatingPic);
   EEPROM.get(PRIORITY_EE, Priority);
 
+  HTimeOut = 0;
+  HInMotion = 0;
+
   Serial.begin(115200);
   BSensors.begin();
+  HSensors.begin();
 
   Serial.println("Serial start");
 
@@ -259,7 +268,13 @@ void loop() {
     TempUpdate();
     Serial.println("Temp Update");
   }
-  
+
+  if(millis() % 3000 == 0){
+    HTempUpdate();
+    UpdateLogistics();
+    Thermosthat();
+    Serial.println("Thermosthat Update");
+  }
   nexLoop(nex_listen_list);
   
 }

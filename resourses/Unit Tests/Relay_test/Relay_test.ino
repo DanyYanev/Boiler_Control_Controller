@@ -24,14 +24,14 @@ void setup() {
   pinMode(RELAY6, OUTPUT);
   pinMode(RELAY7, OUTPUT);
   pinMode(RELAY8, OUTPUT);
-  //pinMode(RELAY9, OUTPUT);
-  //pinMode(RELAY10, OUTPUT);
-  //pinMode(RELAY11, OUTPUT);
-  //pinMode(RELAY12, OUTPUT);
+  pinMode(RELAY9, OUTPUT);
+  pinMode(RELAY10, OUTPUT);
+  pinMode(RELAY11, OUTPUT);
+  pinMode(RELAY12, OUTPUT);
   
   Serial.begin(9600);
   
-  for(int i = 0; i < 8; i++){
+  for(int i = 0; i < 12; i++){
     digitalWrite(relays[i], HIGH);
   }
 }
@@ -53,5 +53,5 @@ void loop() {
 
   i++;
   
-  if(i == 8) i = 0;
+  if(i == 12) i = 0;
 }
