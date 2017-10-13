@@ -62,6 +62,10 @@ extern uint32_t BHistSet;
 extern uint32_t HTemp;
 extern uint32_t HTempSet;
 
+//Whether or not H requires adjusting.
+extern int HState;
+extern int HTimeOut;
+
 extern bool PoolPump;
 extern bool FloorPump;
 extern bool ConvPump;
@@ -73,11 +77,15 @@ extern bool HeatingSource;
 extern bool HeatingState;
 extern bool HeatingPic;
 extern bool Priority;
+extern bool HInMotion;
+extern bool BCharge;
 
 
 extern OneWire BSensor;
+extern OneWire HSensor;
 
 extern DallasTemperature BSensors;
+extern DallasTemperature HSensors;
 
 extern NexPage page0;
 extern NexPage page1;
@@ -87,6 +95,7 @@ extern NexPage page5;
 extern NexNumber BTempN;
 extern NexNumber BTempSetN;
 extern NexNumber BHistSetN;
+extern NexNumber HTempN;
 extern NexNumber HTempSetN;
 
 extern NexCrop buttonPoolPump;
@@ -138,7 +147,7 @@ void UpdateSingleRelays(bool state, bool master, int relay1){  //Update Relay Fu
   }
 }
 
-void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){ //BOILER SOURCE
+void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){ 
   if(master){
     if(state){
       digitalWrite(relay1, LOW);
@@ -155,6 +164,27 @@ void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){ //BOIL
     digitalWrite(relay1, HIGH);
     digitalWrite(relay2, HIGH);
   }
+}
+
+void Thermosthat(){
+    if(!HInMotion){
+      if(HTimeOut == 2){ // will allow motor usage after 3 loops (3x3s)
+         if(HState == 1){ //Too hot
+          UpdateDoubleRelays(1, 1, RELAY9, RELAY10);
+          HInMotion = true;
+        } else if(HState == -1){ // Too cold
+          Serial.println("TOO COLD");
+          UpdateDoubleRelays(1, 1, RELAY10, RELAY9);
+          HInMotion = true;
+        } else {
+          // HTimeOut = 0;  controled by UpdateLogistics
+        } 
+      } else HTimeOut++;  
+    } else {
+      UpdateDoubleRelays(1, 0, RELAY9, RELAY10); //Turns both off.
+      HInMotion = false;
+      HTimeOut = 0; 
+    }
 }
 
 void UpdateSourceK(){
@@ -184,9 +214,9 @@ void UpdateSourceHP(){
 }
 
 void UpdatePriority(){
-  if(Priority && BoilerState && BoilerSource && HeatingState && HeatingSource && (FloorPump || ConvPump || FloorConvPump)){
+  if(Priority && BoilerState && BoilerSource && HeatingState && HeatingSource && (ConvPump || FloorConvPump)){
       HeatingState = false;
-      UpdateSingleRelays(FloorPump, HeatingState, RELAY3);
+      UpdateSingleRelays(FloorPump, !HeatingState, RELAY3);
       UpdateSingleRelays(ConvPump, HeatingState, RELAY4);
       UpdateSingleRelays(FloorConvPump, HeatingState, RELAY5);
       UpdateSourceK();
@@ -203,18 +233,49 @@ void UpdatePriority(){
 
 void UpdateLogistics(){
   if(BoilerPic){
-    if(BTemp > (BTempSet - BHistSet)){
-      BoilerState = false;
-      UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+    if(BCharge){
+      if(BTemp > BTempSet){
+        BoilerState = false;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+        BCharge = false;
+      } else {
+        BoilerState = true;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+      }
     } else {
-      BoilerState = true;
-      UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+      if(BTemp > (BTempSet - BHistSet)){
+        BoilerState = false;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+      } else {
+        BoilerState = true;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+        BCharge = true;
+      }
     }
   } else {
     BoilerState = false;
     UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
   }
-  /*
+
+  
+  if(FloorPump && HeatingState){
+    Serial.println("INSIDE LOGISTICS");
+    if(HTemp > HTempSet){
+      HState = 1;
+    } else if(HTemp < HTempSet){
+      HState = -1;
+    } else HState = 0;
+  } else {
+    HState = 0;
+  }
+  Serial.print("HState is: ");
+  Serial.println(HState);
+  if(HState == 0){
+      UpdateDoubleRelays(1, 0, RELAY9, RELAY10); //Turns both off.
+      HInMotion = false;
+      HTimeOut = 0; 
+  }
+  /*HState
   if(HeatingPic){
     if(HTemp >= HTempSet){
       HeatingState = false; 
@@ -226,15 +287,27 @@ void UpdateLogistics(){
   UpdatePriority();
 }
 
-void TempUpdate(){
- 
-  //dbSerialPrintln("IN");
+void BTempUpdate(){
   BSensors.requestTemperatures();
   BTemp = BSensors.getTempCByIndex(0);
   BTempN.setValue(BTemp);
-  UpdateLogistics();
 }
 
+void HTempUpdate(){
+  HSensors.requestTemperatures();
+  HTemp = HSensors.getTempCByIndex(0);
+  HTempN.setValue(HTemp);  
+  
+}
+
+void TempUpdate(){
+ 
+  //dbSerialPrintln("IN");
+  BTempUpdate();
+  HTempUpdate();
+  //HTempN
+  UpdateLogistics();
+}
 
 /*
    BUTTONS component callback function.
