@@ -81,6 +81,7 @@ bool HeatingState;
 bool HeatingPic;
 bool Priority;
 bool HInMotion;
+bool BCharge;
 
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 
@@ -215,6 +216,7 @@ void setup() {
   EEPROM.get(HEATING_STATE_EE, HeatingPic);
   EEPROM.get(PRIORITY_EE, Priority);
 
+  BCharge = 0;
   HTimeOut = 0;
   HInMotion = 0;
 

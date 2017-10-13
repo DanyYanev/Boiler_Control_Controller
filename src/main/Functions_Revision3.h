@@ -78,6 +78,7 @@ extern bool HeatingState;
 extern bool HeatingPic;
 extern bool Priority;
 extern bool HInMotion;
+extern bool BCharge;
 
 
 extern OneWire BSensor;
@@ -232,12 +233,24 @@ void UpdatePriority(){
 
 void UpdateLogistics(){
   if(BoilerPic){
-    if(BTemp > (BTempSet - BHistSet)){
-      BoilerState = false;
-      UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+    if(BCharge){
+      if(BTemp > BTempSet){
+        BoilerState = false;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+        BCharge = false;
+      } else {
+        BoilerState = true;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+      }
     } else {
-      BoilerState = true;
-      UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+      if(BTemp > (BTempSet - BHistSet)){
+        BoilerState = false;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+      } else {
+        BoilerState = true;
+        UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+        BCharge = true;
+      }
     }
   } else {
     BoilerState = false;
@@ -245,7 +258,7 @@ void UpdateLogistics(){
   }
 
   
-  if(HeatingPic && FloorPump){
+  if(FloorPump && HeatingState){
     Serial.println("INSIDE LOGISTICS");
     if(HTemp > HTempSet){
       HState = 1;
