@@ -98,7 +98,7 @@ NexPage page2 = NexPage(2, 0, "page2");
 NexPage page5 = NexPage(5, 0, "page5");
 
 NexNumber BTempN = NexNumber(0, 4, "BTemp");
-NexNumber HTempN = NexNumber(0, 5, "HTempN");
+NexNumber HTempN = NexNumber(0, 5, "HTemp");
 NexNumber BTempSetN = NexNumber(1, 4, "BTempSet");
 NexNumber BHistSetN = NexNumber(1, 3, "BHistSet");
 NexNumber HTempSetN = NexNumber(5, 6, "HTempSet");
@@ -268,15 +268,16 @@ void loop() {
   
   if(millis() % 10000 == 0){
     TempUpdate();
-    Serial.println("Temp Update");
+    //Serial.println("Temp Update");
   }
 
   if(millis() % 3000 == 0){
     HTempUpdate();
     UpdateLogistics();
     Thermosthat();
-    Serial.println("Thermosthat Update");
+    //Serial.println("Thermosthat Update");
   }
+  
   nexLoop(nex_listen_list);
   
 }

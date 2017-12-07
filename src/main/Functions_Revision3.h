@@ -199,7 +199,7 @@ void UpdateSourceK(){
     }
   }
   if(PoolPump) K = true;
-  //dbSerialPrintln(K);
+  //dbSerialPrintln("YOU WORKING?");
   UpdateSingleRelays(K, 1, RELAY8);
 }
 
@@ -296,6 +296,7 @@ void BTempUpdate(){
 void HTempUpdate(){
   HSensors.requestTemperatures();
   HTemp = HSensors.getTempCByIndex(0);
+  Serial.println(HTemp);
   HTempN.setValue(HTemp);  
   
 }
