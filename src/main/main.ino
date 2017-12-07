@@ -213,7 +213,9 @@ void setup() {
   EEPROM.get(BOILER_SOURCE_EE, BoilerSource);
   EEPROM.get(BOILER_STATE_EE, BoilerPic);
   EEPROM.get(HEATING_SOURCE_EE, HeatingSource);
-  EEPROM.get(HEATING_STATE_EE, HeatingPic);
+  EEPROM.get(HEATING_STATE_EE, HeatingState);
+  Serial.print("READ: ");
+  Serial.println(HeatingState); 
   EEPROM.get(PRIORITY_EE, Priority);
 
   BCharge = 0;

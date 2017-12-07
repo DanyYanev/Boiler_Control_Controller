@@ -170,15 +170,14 @@ void Thermosthat(){
     if(!HInMotion){
       if(HTimeOut == 2){ // will allow motor usage after 3 loops (3x3s)
          if(HState == 1){ //Too hot
+          Serial.println("TOO HOT");
           UpdateDoubleRelays(1, 1, RELAY9, RELAY10);
           HInMotion = true;
         } else if(HState == -1){ // Too cold
           Serial.println("TOO COLD");
           UpdateDoubleRelays(1, 1, RELAY10, RELAY9);
           HInMotion = true;
-        } else {
-          // HTimeOut = 0;  controled by UpdateLogistics
-        } 
+        }
       } else HTimeOut++;  
     } else {
       UpdateDoubleRelays(1, 0, RELAY9, RELAY10); //Turns both off.
@@ -259,7 +258,7 @@ void UpdateLogistics(){
 
   
   if(FloorPump && HeatingState){
-    Serial.println("INSIDE LOGISTICS");
+    //Serial.println("INSIDE LOGISTICS");
     if(HTemp > HTempSet){
       HState = 1;
     } else if(HTemp < HTempSet){
@@ -268,8 +267,8 @@ void UpdateLogistics(){
   } else {
     HState = 0;
   }
-  Serial.print("HState is: ");
-  Serial.println(HState);
+  //Serial.print("HState is: ");
+  //Serial.println(HState);
   if(HState == 0){
       UpdateDoubleRelays(1, 0, RELAY9, RELAY10); //Turns both off.
       HInMotion = false;
@@ -296,9 +295,7 @@ void BTempUpdate(){
 void HTempUpdate(){
   HSensors.requestTemperatures();
   HTemp = HSensors.getTempCByIndex(0);
-  Serial.println(HTemp);
   HTempN.setValue(HTemp);  
-  
 }
 
 void TempUpdate(){
@@ -363,6 +360,8 @@ void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF
   if(HeatingState)HeatingState = false;
   else HeatingState = true;
   EEPROM.put(HEATING_STATE_EE, HeatingState);
+  Serial.print("PUTTING: ");
+  Serial.println(HeatingState); 
   
   dbSerialPrint("Heating Swich");
   dbSerialPrint(HeatingState);
