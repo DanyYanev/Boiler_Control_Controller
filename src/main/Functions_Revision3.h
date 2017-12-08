@@ -258,7 +258,6 @@ void UpdateLogistics(){
 
   
   if(FloorPump && HeatingState){
-    //Serial.println("INSIDE LOGISTICS");
     if(HTemp > HTempSet){
       HState = 1;
     } else if(HTemp < HTempSet){
@@ -267,22 +266,13 @@ void UpdateLogistics(){
   } else {
     HState = 0;
   }
-  //Serial.print("HState is: ");
-  //Serial.println(HState);
+
   if(HState == 0){
       UpdateDoubleRelays(1, 0, RELAY9, RELAY10); //Turns both off.
       HInMotion = false;
       HTimeOut = 0; 
   }
-  /*HState
-  if(HeatingPic){
-    if(HTemp >= HTempSet){
-      HeatingState = false; 
-    } else {
-      HeatingState = true;
-    }
-  }
-  */
+
   UpdatePriority();
 }
 
@@ -386,7 +376,7 @@ void buttonPriorityPushCallBack(void *ptr){
 void buttonBTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
 
-  if(BTempSet < 90){
+  if(BTempSet < 85){
     BTempSet++;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
@@ -397,7 +387,7 @@ void buttonBTempUpPushCallBack(void *ptr){
 void buttonBTempDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempDownPushCallBack");
 
-  if(BTempSet > 40){
+  if(BTempSet > 65){
     BTempSet--;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
