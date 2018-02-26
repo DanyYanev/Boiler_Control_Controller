@@ -25,10 +25,8 @@
 #include <NexUpload.h>
 #include <NexVariable.h>
 #include <NexWaveform.h>
-//#include <EEPROM.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-//#include <LiquidCrystal.h>
 
 #include "Functions_Revision3.h"
 /*
@@ -47,18 +45,18 @@
 #define BHIST_SET_EE 74
 #define HTEMP_SET_EE 106
  
-int RELAY1 = 31;
-int RELAY2 = 33;
-int RELAY3 = 35;
-int RELAY4 = 37;
-int RELAY5 = 39;
-int RELAY6 = 41;
-int RELAY7 = 43;
-int RELAY8 = 45;
-int RELAY9 = 47;
-int RELAY10 = 49;
-int RELAY11 = 51;
-int RELAY12 = 53;
+int RELAY1 = 30;
+int RELAY2 = 32;
+int RELAY3 = 34;
+int RELAY4 = 36;
+int RELAY5 = 38;
+int RELAY6 = 40;
+int RELAY7 = 42;
+int RELAY8 = 44;
+int RELAY9 = 46;
+int RELAY10 = 48;
+int RELAY11 = 50;
+int RELAY12 = 52;
 
 uint32_t BTemp;
 uint32_t BTempSet;
@@ -263,21 +261,29 @@ void setup() {
   
 }
 
+unsigned long currentMillis = millis();
+unsigned long lastBoilerMillis = currentMillis;
+unsigned long lastHeatingMillis = currentMillis;
+
 void loop() {
-  // put your main code here, to run repeatedly:
+
+  currentMillis = millis();
   
-  if(millis() % 10000 == 0){
+  if ((unsigned long)(currentMillis - lastBoilerMillis) >= 60000) { //every minute 60000 = 60s
     TempUpdate();
-    //Serial.println("Temp Update");
+
+    lastBoilerMillis = currentMillis;
   }
 
-  if(millis() % 3000 == 0){
+
+  if ((unsigned long)(currentMillis - lastHeatingMillis) >= 3000) {
     HTempUpdate();
     UpdateLogistics();
     Thermosthat();
-    //Serial.println("Thermosthat Update");
+
+    lastHeatingMillis = currentMillis;
   }
-  
+
   nexLoop(nex_listen_list);
   
 }
