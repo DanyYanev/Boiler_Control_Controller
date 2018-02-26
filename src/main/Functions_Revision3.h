@@ -125,6 +125,9 @@ extern NexButton buttonBackB;
 extern NexButton buttonBackS;
 extern NexButton buttonBackH;
 
+void HTempUpdate();
+void UpdateLogistics();
+
 void Pic_Update(bool state, NexCrop button, int pageOn, int pageOff){
   uint32_t var;
   if(state)var = pageOn;
@@ -167,23 +170,25 @@ void UpdateDoubleRelays(bool state, bool master, int relay1, int relay2){
 }
 
 void Thermosthat(){
-    if(!HInMotion){
-      if(HTimeOut == 2){ // will allow motor usage after 3 loops (3x3s)
-         if(HState == 1){ //Too hot
-          Serial.println("TOO HOT");
-          UpdateDoubleRelays(1, 1, RELAY9, RELAY10);
-          HInMotion = true;
-        } else if(HState == -1){ // Too cold
-          Serial.println("TOO COLD");
-          UpdateDoubleRelays(1, 1, RELAY10, RELAY9);
-          HInMotion = true;
-        }
-      } else HTimeOut++;  
-    } else {
-      UpdateDoubleRelays(1, 0, RELAY9, RELAY10); //Turns both off.
-      HInMotion = false;
-      HTimeOut = 0; 
-    }
+  if(!HInMotion && HeatingState && FloorPump){
+    if(HTimeOut >= 2){ // will allow motor usage after 3 loops (3x3s)
+       HTempUpdate();
+       UpdateLogistics();
+       if(HState == 1){ //Too hot
+        Serial.println("TOO HOT");
+        UpdateDoubleRelays(1, 1, RELAY9, RELAY10);
+        HInMotion = true;
+       } else if(HState == -1){ // Too cold
+        Serial.println("TOO COLD");
+        UpdateDoubleRelays(1, 1, RELAY10, RELAY9);
+        HInMotion = true;
+      }
+    } else HTimeOut++;  
+  } else {
+    UpdateDoubleRelays(1, 0, RELAY9, RELAY10); //Turns both off.
+    HInMotion = false;
+    HTimeOut = 0; 
+  } 
 }
 
 void UpdateSourceK(){

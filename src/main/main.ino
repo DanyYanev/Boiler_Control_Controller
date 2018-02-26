@@ -277,8 +277,6 @@ void loop() {
 
 
   if ((unsigned long)(currentMillis - lastHeatingMillis) >= 3000) {
-    HTempUpdate();
-    UpdateLogistics();
     Thermosthat();
 
     lastHeatingMillis = currentMillis;
