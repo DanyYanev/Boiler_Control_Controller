@@ -218,15 +218,19 @@ void UpdateSourceHP(){
 }
 
 void UpdatePriority(){
-  if(Priority && BoilerState && BoilerSource && HeatingState && HeatingSource && (ConvPump || FloorConvPump)){
+  if(Priority && BoilerState && BoilerSource && HeatingPic && HeatingSource && (ConvPump || FloorConvPump || FloorPump)){
       HeatingState = false;
-      UpdateSingleRelays(FloorPump, !HeatingState, RELAY3);
+      UpdateSingleRelays(FloorPump, HeatingState, RELAY3);
       UpdateSingleRelays(ConvPump, HeatingState, RELAY4);
       UpdateSingleRelays(FloorConvPump, HeatingState, RELAY5);
       UpdateSourceK();
       UpdateSourceHP();
-      HeatingState = true;
   } else {
+      if(HeatingPic){
+        HeatingState = true;
+      } else {
+        HeatingState = false;
+      }
       UpdateSingleRelays(FloorPump, HeatingState, RELAY3);
       UpdateSingleRelays(ConvPump, HeatingState, RELAY4);
       UpdateSingleRelays(FloorConvPump, HeatingState, RELAY5);
@@ -334,7 +338,7 @@ void buttonBack0PushCallback(void *ptr){  //GO BACK TO HOME PAGE
   TempUpdate();
   Pic_Update(PoolPump, buttonPoolPump, 7, 2);
   Pic_Update(BoilerPic, buttonBoilerSwichC, 7, 2);
-  Pic_Update(HeatingState, buttonHeatingSwichC, 7, 2);
+  Pic_Update(HeatingPic, buttonHeatingSwichC, 7, 2);
 }
 
 //LOGISTIC FUNCTIONS
@@ -352,18 +356,19 @@ void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
 }
 
 void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF 
-  if(HeatingState)HeatingState = false;
-  else HeatingState = true;
-  EEPROM.put(HEATING_STATE_EE, HeatingState);
+  if(HeatingPic)HeatingPic = false;
+  else HeatingPic = true;
+  EEPROM.put(HEATING_STATE_EE, HeatingPic);
   Serial.print("PUTTING: ");
-  Serial.println(HeatingState); 
+  Serial.println(HeatingPic); 
   
   dbSerialPrint("Heating Swich");
-  dbSerialPrint(HeatingState);
+  dbSerialPrint(HeatingPic);
   
   //UpdatePriority();
   UpdateLogistics();
-  Pic_Update(HeatingState, buttonHeatingSwichC, 7, 2);
+  
+  Pic_Update(HeatingPic, buttonHeatingSwichC, 7, 2);
 }
 
 void buttonPriorityPushCallBack(void *ptr){
@@ -373,7 +378,7 @@ void buttonPriorityPushCallBack(void *ptr){
   else Priority = true;
   EEPROM.put(PRIORITY_EE, Priority);
 
-  UpdatePriority();
+  UpdateLogistics();
   
   Pic_Update(Priority, buttonPriority, 6, 4);
 }
@@ -445,9 +450,9 @@ void buttonBoilerSourceKSwapPushCallBack(void *ptr){   //BOILER SOURCE
 
   BoilerSource = true;
   EEPROM.put(BOILER_SOURCE_EE, BoilerSource);
-  UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
+  UpdateLogistics();
   
-  UpdatePriority();
+  UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
   
   Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
 }
@@ -457,9 +462,9 @@ void buttonBoilerSourceHSwapPushCallBack(void *ptr){    //BOILER SOURCE
 
   BoilerSource = false;
   EEPROM.put(BOILER_SOURCE_EE, BoilerSource);
+  UpdateLogistics();
   
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
-  UpdatePriority();
   
   Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
 }
