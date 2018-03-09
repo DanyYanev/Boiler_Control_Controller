@@ -219,6 +219,7 @@ void setup() {
   HInMotion = 0;
 
   Serial.begin(115200);
+  Serial3.begin(115200);
   BSensors.begin();
   HSensors.begin();
 
@@ -285,6 +286,12 @@ void loop() {
   nexLoop(nex_listen_list);
   
 }
- 
+
+void serialEvent3() {
+  while (Serial3.available()) {
+  String data = Serial3.readString();
+  Serial.print(data);
+  }
+}
   
 

@@ -24,23 +24,22 @@ void loop() {
  
     HTTPClient http;  //Declare an object of class HTTPClient
  
-    http.begin("http://192.168.1.124:3000/users/12345.json");  //Specify request destination
+    http.begin("http://192.168.1.127:3000/users/12345.json");  //Specify request destination
     http.addHeader("Content-Type", "application/json");
     int httpCode = http.GET();                                                                  //Send the request
  
     if (httpCode > 0) { //Check the returning code
  
       String payload = http.getString();   //Get the request response payload
-      Serial.println(payload);                     //Print the response payload
+      payload += '\n';
+      Serial.print(payload);                     //Print the response payload
  
     }
  
     http.end();   //Close connection
  
   }
-
-  Serial.println("After if");
  
-  delay(10000);    //Send a request every 30 seconds
+  delay(10000);    //Send a request every 10 seconds
  
 }
