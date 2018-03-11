@@ -55,6 +55,7 @@ extern int RELAY9;
 extern int RELAY10;
 extern int RELAY11;
 extern int RELAY12;
+extern int RESET_PIN;
 
 extern uint32_t BTemp;
 extern uint32_t BTempSet;
@@ -124,6 +125,7 @@ extern NexButton buttonHSourceHP;
 extern NexButton buttonBackB;
 extern NexButton buttonBackS;
 extern NexButton buttonBackH;
+extern NexButton buttonReset;
 
 void HTempUpdate();
 void UpdateLogistics();
@@ -491,8 +493,7 @@ void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
   Pic_Update(HeatingSource, buttonHeatingSource, 8, 5);
 }
 
-void buttonPoolPumpPushCallback(void *ptr)   //POOL PUMP ON OFF
-{
+void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
   dbSerialPrintln("PoolPumpPopCallback");
   
   if(PoolPump)PoolPump = false;
@@ -506,8 +507,7 @@ void buttonPoolPumpPushCallback(void *ptr)   //POOL PUMP ON OFF
   
 }
 
-void buttonFloorPumpPushCallback(void *ptr)   //FLOOR PUMP ON OFF
-{
+void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
   dbSerialPrintln("FloorPumpPopCallback");
   
   if(FloorPump)FloorPump = false;
@@ -519,8 +519,7 @@ void buttonFloorPumpPushCallback(void *ptr)   //FLOOR PUMP ON OFF
   Pic_Update(FloorPump, buttonFloorPump, 8, 5);
 }
 
-void buttonConvPumpPushCallback(void *ptr)    //CONV PUMP ON OFF
-{
+void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
   dbSerialPrintln("ConvPumpPopCallback");
   
   if(ConvPump)ConvPump = false;
@@ -532,8 +531,7 @@ void buttonConvPumpPushCallback(void *ptr)    //CONV PUMP ON OFF
   Pic_Update(ConvPump, buttonConvPump, 8, 5);
 }
 
-void buttonFloorConvPumpPushCallback(void *ptr)   //FLOOR CONV PUMP ON OFF
-{
+void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
   dbSerialPrintln("FloorConvPopCallback");
   
   if(FloorConvPump)FloorConvPump = false;
@@ -543,5 +541,10 @@ void buttonFloorConvPumpPushCallback(void *ptr)   //FLOOR CONV PUMP ON OFF
   UpdatePriority();
   
   Pic_Update(FloorConvPump, buttonFloorConvPump, 8, 5);
+}
+
+void buttonResetPushCallback(void *ptr){
+  Serial.println("Reseting");
+  digitalWrite(RESET_PIN, LOW);
 }
 
