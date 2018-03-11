@@ -43,3 +43,13 @@ void loop() {
   delay(10000);    //Send a request every 10 seconds
  
 }
+
+void serialEvent() {
+  while (Serial.available()) {
+    String data = Serial.readString();
+    if(data == "Reset"){
+      Serial.println("Reseting ESP");
+      ESP.reset();
+    }
+  }
+}

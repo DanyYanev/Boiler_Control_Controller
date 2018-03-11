@@ -575,7 +575,7 @@ void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
 
 void buttonResetPushCallback(void *ptr){
   Serial.println("Reseting");
-//  Serial3.println("Reset");
+  Serial3.println("Reset");
   digitalWrite(RESET_PIN, LOW);
 //  delay(10);
 //  digitalWrite(RESET_PIN, HIGH);
