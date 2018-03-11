@@ -58,6 +58,8 @@ int RELAY10 = 48;
 int RELAY11 = 50;
 int RELAY12 = 52;
 
+int RESET_PIN = 8;
+
 uint32_t BTemp;
 uint32_t BTempSet;
 uint32_t BHistSet;
@@ -127,6 +129,7 @@ NexButton buttonHSourceHP = NexButton(5, 5, "HSourceHP");
 NexButton buttonBackB = NexButton(1, 2, "Back");
 NexButton buttonBackS = NexButton(2, 4, "Back");
 NexButton buttonBackH = NexButton(5, 3, "Back");
+NexButton buttonReset = NexButton(2, 5, "Reset");
 
 
 
@@ -157,6 +160,7 @@ NexTouch *nex_listen_list[] =
   &buttonBackB,
   &buttonBackS,
   &buttonBackH,
+  &buttonReset,
   NULL
 };
 
@@ -182,6 +186,8 @@ void setup() {
   pinMode(RELAY10, OUTPUT);
   pinMode(RELAY11, OUTPUT);
   pinMode(RELAY12, OUTPUT);
+
+  pinMode(RESET_PIN, INPUT_PULLUP);
   
    /*
    *OUTPUT start setup. 
@@ -198,6 +204,7 @@ void setup() {
   digitalWrite(RELAY10, HIGH);
   digitalWrite(RELAY11, HIGH);
   digitalWrite(RELAY12, HIGH);
+  //digitalWrite(RESET_PIN, HIGH);
   nexInit();
 
   EEPROM.get(BTEMP_SET_EE, BTempSet);
@@ -254,6 +261,7 @@ void setup() {
   buttonBackB.attachPush(buttonBack0PushCallback);
   buttonBackS.attachPush(buttonBack0PushCallback);
   buttonBackH.attachPush(buttonBack0PushCallback);
+  buttonReset.attachPush(buttonResetPushCallback); 
   
   Serial.println("Setup done");
   //TempUpdate();
