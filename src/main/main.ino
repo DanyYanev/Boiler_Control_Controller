@@ -58,7 +58,7 @@ int RELAY10 = 48;
 int RELAY11 = 50;
 int RELAY12 = 52;
 
-int RESET_PIN = 8;
+int RESET_PIN = 12;
 
 uint32_t BTemp;
 uint32_t BTempSet;
@@ -174,6 +174,9 @@ void setup() {
    /*
    *OUTPUT setup. 
    */
+
+  pinMode(RESET_PIN, OUTPUT);
+  
   pinMode(RELAY1, OUTPUT);
   pinMode(RELAY2, OUTPUT);
   pinMode(RELAY3, OUTPUT);
@@ -187,8 +190,8 @@ void setup() {
   pinMode(RELAY11, OUTPUT);
   pinMode(RELAY12, OUTPUT);
 
-  pinMode(RESET_PIN, INPUT_PULLUP);
-  
+
+  digitalWrite(RESET_PIN, HIGH);
    /*
    *OUTPUT start setup. 
    */

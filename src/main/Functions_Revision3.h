@@ -388,13 +388,13 @@ void buttonPriorityPushCallBack(void *ptr){
 void buttonBTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
 
-  if(BTempSet < 85){
+  if(BTempSet < 75){
     BTempSet++;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   } else {
-    BTempSet = 85;
+    BTempSet = 75;
 //    EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
@@ -420,13 +420,13 @@ void buttonBTempDownPushCallBack(void *ptr){
 void buttonBHistUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBHistUpPushCallBack");
   
-  if(BHistSet < 30){
+  if(BHistSet < 15){
     BHistSet++;
     EEPROM.put(BHIST_SET_EE, BHistSet);
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   } else {
-    BHistSet = 30;
+    BHistSet = 15;
     //EEPROM.put(BHIST_SET_EE, BHistSet);
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
@@ -575,6 +575,9 @@ void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
 
 void buttonResetPushCallback(void *ptr){
   Serial.println("Reseting");
+//  Serial3.println("Reset");
   digitalWrite(RESET_PIN, LOW);
+//  delay(10);
+//  digitalWrite(RESET_PIN, HIGH);
 }
 
