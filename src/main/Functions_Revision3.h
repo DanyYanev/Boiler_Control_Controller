@@ -393,6 +393,11 @@ void buttonBTempUpPushCallBack(void *ptr){
     EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
+  } else {
+    BTempSet = 85;
+//    EEPROM.put(BTEMP_SET_EE, BTempSet);
+    BTempSetN.setValue(BTempSet);
+    UpdateLogistics();
   }
 }
 
@@ -402,6 +407,11 @@ void buttonBTempDownPushCallBack(void *ptr){
   if(BTempSet > 65){
     BTempSet--;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
+    BTempSetN.setValue(BTempSet);
+    UpdateLogistics();
+  } else {
+    BTempSet = 65;
+    //EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   }
@@ -415,6 +425,11 @@ void buttonBHistUpPushCallBack(void *ptr){
     EEPROM.put(BHIST_SET_EE, BHistSet);
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
+  } else {
+    BHistSet = 30;
+    //EEPROM.put(BHIST_SET_EE, BHistSet);
+    BHistSetN.setValue(BHistSet);
+    UpdateLogistics();
   }
 }
   
@@ -423,6 +438,11 @@ void buttonBHistDownPushCallBack(void *ptr){
   if(BHistSet > 2){
     BHistSet--;
     EEPROM.put(BHIST_SET_EE, BHistSet);
+    BHistSetN.setValue(BHistSet);
+    UpdateLogistics();
+  } else {
+    BHistSet = 2;
+    //EEPROM.put(BHIST_SET_EE, BHistSet);
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   }
@@ -434,6 +454,11 @@ void buttonHTempUpPushCallBack(void *ptr){
     EEPROM.put(HTEMP_SET_EE, HTempSet);
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
+  }else {
+    HTempSet = 40;
+    //EEPROM.put(HTEMP_SET_EE, HTempSet);
+    HTempSetN.setValue(HTempSet);
+    UpdateLogistics();
   }
 }
 
@@ -442,6 +467,11 @@ void buttonHTempDownPushCallBack(void *ptr){
   if(HTempSet > 30){
     HTempSet--;
     EEPROM.put(HTEMP_SET_EE, HTempSet);
+    HTempSetN.setValue(HTempSet);
+    UpdateLogistics();
+  }else{
+    HTempSet = 30;
+    //EEPROM.put(HTEMP_SET_EE, HTempSet);
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }
