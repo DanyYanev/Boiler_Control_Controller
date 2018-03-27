@@ -345,8 +345,7 @@ void buttonBack0PushCallback(void *ptr){  //GO BACK TO HOME PAGE
 
 //LOGISTIC FUNCTIONS
 void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
-  if(BoilerPic)BoilerPic = false;
-  else BoilerPic = true;
+  BoilerPic = !BoilerPic;
   EEPROM.put(BOILER_STATE_EE, BoilerPic);
   
   dbSerialPrint("Boiler Swich");
@@ -358,8 +357,7 @@ void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
 }
 
 void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF 
-  if(HeatingPic)HeatingPic = false;
-  else HeatingPic = true;
+  HeatingPic = !HeatingPic;
   EEPROM.put(HEATING_STATE_EE, HeatingPic);
   Serial.print("PUTTING: ");
   Serial.println(HeatingPic); 
@@ -376,8 +374,7 @@ void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF
 void buttonPriorityPushCallBack(void *ptr){
   dbSerialPrintln("buttonPriorityPushCallback");
 
-  if(Priority) Priority = false;
-  else Priority = true;
+  Priority = !Priority;
   EEPROM.put(PRIORITY_EE, Priority);
 
   UpdateLogistics();
@@ -526,8 +523,7 @@ void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
 void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
   dbSerialPrintln("PoolPumpPopCallback");
   
-  if(PoolPump)PoolPump = false;
-  else PoolPump = true;
+  PoolPump = !PoolPump;
   EEPROM.put(POOL_PUMP_EE, PoolPump);
 
   UpdateSingleRelays(PoolPump, 1, RELAY6);
@@ -540,8 +536,8 @@ void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
 void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
   dbSerialPrintln("FloorPumpPopCallback");
   
-  if(FloorPump)FloorPump = false;
-  else FloorPump = true;
+  FloorPump = !FloorPump;
+  
   EEPROM.put(FLOOR_PUMP_EE, FloorPump);
   
   UpdatePriority();
@@ -552,8 +548,8 @@ void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
 void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
   dbSerialPrintln("ConvPumpPopCallback");
   
-  if(ConvPump)ConvPump = false;
-  else ConvPump = true;
+  ConvPump = !ConvPump;
+  
   EEPROM.put(CONV_PUMP_EE, ConvPump);
   
   UpdatePriority();
@@ -564,8 +560,7 @@ void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
 void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
   dbSerialPrintln("FloorConvPopCallback");
   
-  if(FloorConvPump)FloorConvPump = false;
-  else FloorConvPump = true;
+  FloorConvPump = !FloorConvPump;
   EEPROM.put(FLOOR_CONV_PUMP_EE, FloorConvPump);
   
   UpdatePriority();
