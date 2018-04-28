@@ -1,5 +1,5 @@
 #include <EEPROM.h>
-#include <doxygen.h>
+//#include <doxygen.h>
 #include <NexButton.h>
 #include <NexCheckbox.h>
 #include <NexConfig.h>

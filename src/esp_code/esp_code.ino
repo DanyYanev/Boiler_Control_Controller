@@ -21,9 +21,15 @@ bool readConfigFile();
 bool writeConfigFile();
  
 void setup () {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   pinMode(TRIGGER_PIN, INPUT_PULLUP);
+
+  if(SPIFFS.begin()){
+    Serial.println("Filesystem Mounted");
+  } else {
+    Serial.println("Failesystem Not Mounted");
+  }
   
   if (!readConfigFile()) {
     Serial.println("Failed to read configuration file, using default values");
@@ -50,6 +56,7 @@ void setup () {
  
 void loop() {
  if ( (digitalRead(TRIGGER_PIN) == LOW)) {
+//  if(1){
     Serial.println("Configuration portal requested");
     
     char convertedValue[4];
@@ -77,8 +84,11 @@ void loop() {
   } else if (WiFi.status() == WL_CONNECTED && (millis() - lastCheck > TIMEOUT_)) { //Check WiFi connection status
  
     HTTPClient http;  //Declare an object of class HTTPClient
+
+    String addr = String("http://") + String("192.168.34.157") + String(":3000/users/12345.json");
+    Serial.println("SENDING TO:" + addr);
  
-    http.begin("http://192.168.1.127:3000/users/12345.json");  //Specify request destination
+    http.begin(addr);  //Specify request destination
     http.addHeader("Content-Type", "application/json");
     int httpCode = http.GET();                                                                  //Send the request
  
