@@ -1,5 +1,5 @@
 #include <EEPROM.h>
-#include <doxygen.h>
+//#include <doxygen.h>
 #include <NexButton.h>
 #include <NexCheckbox.h>
 #include <NexConfig.h>
@@ -27,6 +27,7 @@
 #include <NexWaveform.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <ArduinoJson.h>
 
 #include "Functions_Revision3.h"
 /*
@@ -277,10 +278,11 @@ unsigned long currentMillis = millis();
 unsigned long lastBoilerMillis = currentMillis;
 unsigned long lastHeatingMillis = currentMillis;
 
+
 void loop() {
 
   currentMillis = millis();
-  
+
   if ((unsigned long)(currentMillis - lastBoilerMillis) >= 60000) { //every minute 60000 = 60s
     TempUpdate();
 
@@ -295,14 +297,7 @@ void loop() {
   }
 
   nexLoop(nex_listen_list);
-  
+
 }
 
-void serialEvent3() {
-  while (Serial3.available()) {
-  String data = Serial3.readString();
-  Serial.print(data);
-  }
-}
-  
 

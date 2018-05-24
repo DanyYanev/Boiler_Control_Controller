@@ -581,3 +581,100 @@ void buttonResetPushCallback(void *ptr){
 //  digitalWrite(RESET_PIN, HIGH);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void parseValues(JsonArray&);
+
+void serialEvent3() {
+  while (Serial3.available()) {
+    String data = Serial3.readString();
+    Serial.println(data);
+
+    if(data[0] == '{'){
+      Serial.println("We got data wohoo");
+
+      StaticJsonBuffer<500> jsonBuffer;
+
+      char jsonbuff[500];
+
+      data.toCharArray(jsonbuff, 500);
+
+      JsonObject& root = jsonBuffer.parseObject(jsonbuff);
+      
+      // Test if parsing succeeds.
+      if (!root.success()) {
+        Serial.println("parseObject() failed");
+        return;
+      }
+    
+      // Fetch value_objects from Json file.
+      if(atoi(root["token"]) != 12345){
+        Serial.println("Wrong token");
+      }
+      
+//      JsonArray& value_objects = root["value_objects_attributes"];
+      
+      parseValues(root["value_objects_attributes"]);
+      
+    }
+
+    
+  }
+}
+
+//JSON PARSERS
+
+void parseValues(JsonArray& valueObjects){
+  
+  for(auto value_object : valueObjects){
+
+    void * ptr;
+        
+    if(strcmp("PoolPump", value_object["key"].as<const char*>()) == 0){
+      if(PoolPump != atoi(value_object["value"].as<const char*>())){
+        buttonPoolPumpPushCallback(ptr);
+      }
+    } else if(strcmp("FloorPump", value_object["key"].as<const char*>()) == 0){
+      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+        buttonFloorPumpPushCallback(ptr);
+      }
+    } else if(strcmp("ConvPump", value_object["key"].as<const char*>()) == 0){
+      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+        buttonConvPumpPushCallback(ptr);
+      }
+    } else if(strcmp("FloorConvPump", value_object["key"].as<const char*>()) == 0){
+      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+        buttonFloorConvPumpPushCallback(ptr);
+      }
+//    } else if(strcmp("BoilerSource", value_object["key"].as<const char*>()) == 0){
+//      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+//        buttonPoolPumpPushCallback();
+//      }
+    }else if(strcmp("BoilerPic", value_object["key"].as<const char*>()) == 0){
+      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+        buttonBoilerSwichCPushCallBack(ptr);
+      }
+//    }else if(strcmp("HeatingSource", value_object["key"].as<const char*>()) == 0){
+//      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+//        buttonPoolPumpPushCallback();
+//      }
+    }else if(strcmp("HeatingPic", value_object["key"].as<const char*>()) == 0){
+      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+        buttonHeatingSwichCPushCallBack(ptr);
+      }
+    }else if(strcmp("Priority", value_object["key"].as<const char*>()) == 0){
+      if(FloorPump != atoi(value_object["value"].as<const char*>())){
+        buttonPriorityPushCallBack(ptr);
+      }
+    }else if(strcmp("BTempSet", value_object["key"].as<const char*>()) == 0){
+      BTempSet = atoi(value_object["value"].as<const char*>());
+    }else if(strcmp("HTempSet", value_object["key"].as<const char*>()) == 0){
+      HTempSet = atoi(value_object["value"].as<const char*>());
+    }
+    
+  }
+
+//  page0.show();
+  
+}
+
