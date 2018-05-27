@@ -42,6 +42,13 @@
 #define BTEMP_SET_EE 32
 #define BHIST_SET_EE 74
 #define HTEMP_SET_EE 106
+
+#define BTEMP_TOP 90
+#define BTEMP_BOTTOM 65
+#define BTEMP_HIST_TOP 12
+#define BTEMP_HIST_BOTTOM 2
+#define HTEMP_TOP 40
+#define HTEMP_BOTTOM 30
  
 extern int RELAY1;
 extern int RELAY2;
@@ -129,6 +136,9 @@ extern NexButton buttonReset;
 
 void HTempUpdate();
 void UpdateLogistics();
+void buttonBoilerSwichCFunc();
+void buttonHeatingSwichCFunc();
+void buttonPriorityFunc();
 
 void Pic_Update(bool state, NexCrop button, int pageOn, int pageOff){
   uint32_t var;
@@ -345,6 +355,10 @@ void buttonBack0PushCallback(void *ptr){  //GO BACK TO HOME PAGE
 
 //LOGISTIC FUNCTIONS
 void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
+  buttonBoilerSwichCFunc();
+}
+
+void buttonBoilerSwichCFunc(){
   if(BoilerPic)BoilerPic = false;
   else BoilerPic = true;
   EEPROM.put(BOILER_STATE_EE, BoilerPic);
@@ -357,12 +371,16 @@ void buttonBoilerSwichCPushCallBack(void *ptr){ //BOILER ON OFF
   Pic_Update(BoilerPic, buttonBoilerSwichC, 7, 2);
 }
 
+
 void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF 
-  if(HeatingPic)HeatingPic = false;
-  else HeatingPic = true;
+  buttonHeatingSwichCFunc();
+}
+
+void buttonHeatingSwichCFunc(){
+  HeatingPic = !HeatingPic;
   EEPROM.put(HEATING_STATE_EE, HeatingPic);
-  Serial.print("PUTTING: ");
-  Serial.println(HeatingPic); 
+//  Serial.print("PUTTING: ");
+//  Serial.println(HeatingPic); 
   
   dbSerialPrint("Heating Swich");
   dbSerialPrint(HeatingPic);
@@ -373,7 +391,13 @@ void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF
   Pic_Update(HeatingPic, buttonHeatingSwichC, 7, 2);
 }
 
+
+
 void buttonPriorityPushCallBack(void *ptr){
+  buttonPriorityFunc();
+}
+
+void buttonPriorityFunc(){
   dbSerialPrintln("buttonPriorityPushCallback");
 
   if(Priority) Priority = false;
@@ -385,17 +409,18 @@ void buttonPriorityPushCallBack(void *ptr){
   Pic_Update(Priority, buttonPriority, 6, 4);
 }
 
+
+
 void buttonBTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
 
-  if(BTempSet < 75){
+  if(BTempSet < BTEMP_TOP){
     BTempSet++;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   } else {
-    BTempSet = 75;
-//    EEPROM.put(BTEMP_SET_EE, BTempSet);
+    BTempSet = BTEMP_TOP;
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   }
@@ -404,14 +429,13 @@ void buttonBTempUpPushCallBack(void *ptr){
 void buttonBTempDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempDownPushCallBack");
 
-  if(BTempSet > 65){
+  if(BTempSet > BTEMP_BOTTOM){
     BTempSet--;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   } else {
-    BTempSet = 65;
-    //EEPROM.put(BTEMP_SET_EE, BTempSet);
+    BTempSet = BTEMP_BOTTOM;
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   }
@@ -420,14 +444,13 @@ void buttonBTempDownPushCallBack(void *ptr){
 void buttonBHistUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBHistUpPushCallBack");
   
-  if(BHistSet < 15){
+  if(BHistSet < BTEMP_HIST_TOP){
     BHistSet++;
     EEPROM.put(BHIST_SET_EE, BHistSet);
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   } else {
-    BHistSet = 15;
-    //EEPROM.put(BHIST_SET_EE, BHistSet);
+    BHistSet = BTEMP_HIST_TOP;
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   }
@@ -435,28 +458,26 @@ void buttonBHistUpPushCallBack(void *ptr){
   
 void buttonBHistDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBHistDownPushCallBack");
-  if(BHistSet > 2){
+  if(BHistSet > BTEMP_HIST_BOTTOM){
     BHistSet--;
     EEPROM.put(BHIST_SET_EE, BHistSet);
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   } else {
-    BHistSet = 2;
-    //EEPROM.put(BHIST_SET_EE, BHistSet);
+    BHistSet = BTEMP_HIST_BOTTOM;
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   }
 }
 void buttonHTempUpPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempUpPushCallBack");
-  if(HTempSet < 40){
+  if(HTempSet < HTEMP_TOP){
     HTempSet++;
     EEPROM.put(HTEMP_SET_EE, HTempSet);
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }else {
-    HTempSet = 40;
-    //EEPROM.put(HTEMP_SET_EE, HTempSet);
+    HTempSet = HTEMP_TOP;
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }
@@ -464,20 +485,20 @@ void buttonHTempUpPushCallBack(void *ptr){
 
 void buttonHTempDownPushCallBack(void *ptr){
   dbSerialPrintln("buttonBTempDownPushCallBack");
-  if(HTempSet > 30){
+  if(HTempSet > HTEMP_BOTTOM){
     HTempSet--;
     EEPROM.put(HTEMP_SET_EE, HTempSet);
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }else{
-    HTempSet = 30;
-    //EEPROM.put(HTEMP_SET_EE, HTempSet);
+    HTempSet = HTEMP_BOTTOM;
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }
 }
 
-void buttonBoilerSourceKSwapPushCallBack(void *ptr){   //BOILER SOURCE
+
+void buttonBoilerSourceKSwapFunc(){   //BOILER SOURCE
   dbSerialPrintln("Boiler Source Swap to Kotel");
 
   BoilerSource = true;
@@ -489,7 +510,12 @@ void buttonBoilerSourceKSwapPushCallBack(void *ptr){   //BOILER SOURCE
   Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
 }
 
-void buttonBoilerSourceHSwapPushCallBack(void *ptr){    //BOILER SOURCE
+void buttonBoilerSourceKSwapPushCallBack(void *ptr){   //BOILER SOURCE
+  buttonBoilerSourceKSwapFunc();
+}
+
+
+void buttonBoilerSourceHSwapFunc(){    //BOILER SOURCE
   dbSerialPrintln("Boiler Source Swap to Heater");
 
   BoilerSource = false;
@@ -501,7 +527,12 @@ void buttonBoilerSourceHSwapPushCallBack(void *ptr){    //BOILER SOURCE
   Pic_Update(BoilerSource, buttonBoilerSource, 6, 4);
 }
 
-void buttonHeatingSourceKSwapPushCallBack(void *ptr){   //HEATING SOURCE
+void buttonBoilerSourceHSwapPushCallBack(void *ptr){    //BOILER SOURCE
+  buttonBoilerSourceHSwapFunc();
+}
+
+
+void buttonHeatingSourceKSwapFunc(){   //HEATING SOURCE
   dbSerialPrintln("Heating Source Swap to Kotel");
 
   HeatingSource = true;
@@ -512,8 +543,12 @@ void buttonHeatingSourceKSwapPushCallBack(void *ptr){   //HEATING SOURCE
   Pic_Update(HeatingSource, buttonHeatingSource, 8, 5);
 }
 
-void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
-  dbSerialPrintln("Boiler Source Swap to El Pompa");
+void buttonHeatingSourceKSwapPushCallBack(void *ptr){   //HEATING SOURCE
+  buttonHeatingSourceKSwapFunc();
+}
+
+void buttonHeatingSourceHPSwapFunc(){    //HEATING SOURCE
+  dbSerialPrintln("Boiler Source Swap to El Pump");
 
   HeatingSource = false;
   EEPROM.put(HEATING_SOURCE_EE, HeatingSource);
@@ -523,7 +558,11 @@ void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
   Pic_Update(HeatingSource, buttonHeatingSource, 8, 5);
 }
 
-void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
+void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
+  buttonHeatingSourceHPSwapFunc();
+}
+
+void buttonPoolPumpFunc(){   //POOL PUMP ON OFF
   dbSerialPrintln("PoolPumpPopCallback");
   
   if(PoolPump)PoolPump = false;
@@ -534,10 +573,13 @@ void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
   UpdateSourceK();
   
   Pic_Update(PoolPump, buttonPoolPump, 7, 2);
-  
 }
 
-void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
+void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
+  buttonPoolPumpFunc();
+}
+
+void buttonFloorPumpFunc(){   //FLOOR PUMP ON OFF
   dbSerialPrintln("FloorPumpPopCallback");
   
   if(FloorPump)FloorPump = false;
@@ -549,7 +591,11 @@ void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
   Pic_Update(FloorPump, buttonFloorPump, 8, 5);
 }
 
-void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
+void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
+  buttonFloorPumpFunc();
+}
+
+void buttonConvPumpFunc(){    //CONV PUMP ON OFF
   dbSerialPrintln("ConvPumpPopCallback");
   
   if(ConvPump)ConvPump = false;
@@ -561,7 +607,11 @@ void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
   Pic_Update(ConvPump, buttonConvPump, 8, 5);
 }
 
-void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
+void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
+  buttonConvPumpFunc();
+}
+
+void buttonFloorConvPumpFunc(){   //FLOOR CONV PUMP ON OFF
   dbSerialPrintln("FloorConvPopCallback");
   
   if(FloorConvPump)FloorConvPump = false;
@@ -571,6 +621,10 @@ void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
   UpdatePriority();
   
   Pic_Update(FloorConvPump, buttonFloorConvPump, 8, 5);
+}
+
+void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
+  buttonFloorConvPumpFunc();
 }
 
 void buttonResetPushCallback(void *ptr){
@@ -585,9 +639,15 @@ void buttonResetPushCallback(void *ptr){
 
 void parseValues(JsonArray&);
 
-void serialEvent3() {
-  while (Serial3.available()) {
-    String data = Serial3.readString();
+void serialEvent3(){
+  if(Serial3.available()){
+    Serial.println(Serial.readString());
+  }
+}
+
+void serialEvent() {
+  while (Serial.available()) {
+    String data = Serial.readString();
     Serial.println(data);
 
     if(data[0] == '{'){
@@ -614,7 +674,7 @@ void serialEvent3() {
       
 //      JsonArray& value_objects = root["value_objects_attributes"];
       
-      parseValues(root["value_objects_attributes"]);
+      parseValues(root["values_attributes"]);
       
     }
 
@@ -627,54 +687,82 @@ void serialEvent3() {
 void parseValues(JsonArray& valueObjects){
   
   for(auto value_object : valueObjects){
-
-    void * ptr;
         
     if(strcmp("PoolPump", value_object["key"].as<const char*>()) == 0){
       if(PoolPump != atoi(value_object["value"].as<const char*>())){
-        buttonPoolPumpPushCallback(ptr);
+        buttonPoolPumpFunc();
       }
     } else if(strcmp("FloorPump", value_object["key"].as<const char*>()) == 0){
       if(FloorPump != atoi(value_object["value"].as<const char*>())){
-        buttonFloorPumpPushCallback(ptr);
+        buttonFloorPumpFunc();
       }
     } else if(strcmp("ConvPump", value_object["key"].as<const char*>()) == 0){
-      if(FloorPump != atoi(value_object["value"].as<const char*>())){
-        buttonConvPumpPushCallback(ptr);
+      if(ConvPump != atoi(value_object["value"].as<const char*>())){
+        buttonConvPumpFunc();
       }
     } else if(strcmp("FloorConvPump", value_object["key"].as<const char*>()) == 0){
-      if(FloorPump != atoi(value_object["value"].as<const char*>())){
-        buttonFloorConvPumpPushCallback(ptr);
-      }
-//    } else if(strcmp("BoilerSource", value_object["key"].as<const char*>()) == 0){
-//      if(FloorPump != atoi(value_object["value"].as<const char*>())){
-//        buttonPoolPumpPushCallback();
-//      }
-    }else if(strcmp("BoilerPic", value_object["key"].as<const char*>()) == 0){
-      if(FloorPump != atoi(value_object["value"].as<const char*>())){
-        buttonBoilerSwichCPushCallBack(ptr);
-      }
-//    }else if(strcmp("HeatingSource", value_object["key"].as<const char*>()) == 0){
-//      if(FloorPump != atoi(value_object["value"].as<const char*>())){
-//        buttonPoolPumpPushCallback();
-//      }
-    }else if(strcmp("HeatingPic", value_object["key"].as<const char*>()) == 0){
-      if(FloorPump != atoi(value_object["value"].as<const char*>())){
-        buttonHeatingSwichCPushCallBack(ptr);
+      if(FloorConvPump != atoi(value_object["value"].as<const char*>())){
+        buttonFloorConvPumpFunc();
       }
     }else if(strcmp("Priority", value_object["key"].as<const char*>()) == 0){
-      if(FloorPump != atoi(value_object["value"].as<const char*>())){
-        buttonPriorityPushCallBack(ptr);
+      if(Priority != atoi(value_object["value"].as<const char*>())){
+        buttonPriorityFunc();
+      }
+    } else if(strcmp("BoilerSource", value_object["key"].as<const char*>()) == 0){
+      if(BoilerSource != atoi(value_object["value"].as<const char*>())){
+        BoilerSource = !BoilerSource;
+        if(BoilerSource){
+          buttonBoilerSourceKSwapFunc();
+        } else {
+          buttonBoilerSourceHSwapFunc();
+        }
+      }
+    }else if(strcmp("HeatingSource", value_object["key"].as<const char*>()) == 0){
+      if(HeatingSource != atoi(value_object["value"].as<const char*>())){
+        HeatingSource = !HeatingSource;
+        if(HeatingSource){
+          buttonHeatingSourceKSwapFunc();
+        } else {
+          buttonHeatingSourceHPSwapFunc();
+        }
+      }
+    }else if(strcmp("BoilerPic", value_object["key"].as<const char*>()) == 0){
+      if(BoilerPic != atoi(value_object["value"].as<const char*>())){
+        buttonBoilerSwichCFunc();
+      }
+    }else if(strcmp("HeatingPic", value_object["key"].as<const char*>()) == 0){
+      if(HeatingPic != atoi(value_object["value"].as<const char*>())){
+        buttonHeatingSwichCFunc();
       }
     }else if(strcmp("BTempSet", value_object["key"].as<const char*>()) == 0){
-      BTempSet = atoi(value_object["value"].as<const char*>());
+      int target = atoi(value_object["value"].as<const char*>());
+      if(BTempSet != target){
+        if(target > BTEMP_BOTTOM && target < BTEMP_TOP){
+          BTempSet = target;
+        }else if(target <= BTEMP_BOTTOM){
+          BTempSet = BTEMP_BOTTOM;
+        } else if(target >= BTEMP_TOP){
+          BTempSet = BTEMP_TOP;
+        }
+        EEPROM.put(BTEMP_SET_EE, BTempSet);
+        BTempSetN.setValue(BTempSet);
+        UpdateLogistics();
+      }
+      
     }else if(strcmp("HTempSet", value_object["key"].as<const char*>()) == 0){
-      HTempSet = atoi(value_object["value"].as<const char*>());
+      int target = atoi(value_object["value"].as<const char*>());
+      if(HTempSet != target){
+        if(target > HTEMP_BOTTOM && target < HTEMP_TOP){
+          HTempSet = target;
+        }else if(target <= HTEMP_BOTTOM){
+          HTempSet = HTEMP_BOTTOM;
+        } else if(target >= HTEMP_TOP){
+          HTempSet = HTEMP_TOP;
+        }
+        EEPROM.put(HTEMP_SET_EE, HTempSet);
+        HTempSetN.setValue(HTempSet);
+        UpdateLogistics();
+      }
     }
-    
   }
-
-//  page0.show();
-  
 }
-

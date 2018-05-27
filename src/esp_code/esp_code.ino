@@ -71,7 +71,7 @@ void loop() {
     http.addHeader("Content-Type", "application/json");
     int httpCode = http.GET();                    //Send the request
 
-//    Serial.println("Hadooken: "+ String(server_ip) + "/users/12345.json");
+    Serial.println("Sending to: "+ String(server_ip) + "/users/12345.json");
     
     if (httpCode > 0) { //Check the returning code
  
@@ -106,7 +106,7 @@ void configurePortal(){
     if (!wifiManager.startConfigPortal()) {
       Serial.println("Not connected to WiFi but continuing anyway.");
     } else {
-      Serial.println("Connected...yeey :)");
+      Serial.println("Connected...yeey  :)");
     }
     
     server_ip = String(p_server_ip.getValue());
