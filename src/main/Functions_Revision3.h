@@ -88,6 +88,7 @@ extern bool Priority;
 extern bool HInMotion;
 extern bool BCharge;
 
+extern JsonBuilder JB;
 
 extern OneWire BSensor;
 extern OneWire HSensor;
@@ -299,13 +300,21 @@ void UpdateLogistics(){
 
 void BTempUpdate(){
   BSensors.requestTemperatures();
+  int tmp = BTemp;
   BTemp = BSensors.getTempCByIndex(0);
+  if(BTemp != tmp){
+    JB.add("BTemp", String(BTemp));
+  }
   BTempN.setValue(BTemp);
 }
 
 void HTempUpdate(){
   HSensors.requestTemperatures();
+  int tmp = HTemp;
   HTemp = HSensors.getTempCByIndex(0);
+  if(HTemp != tmp){
+    JB.add("HTemp", String(HTemp));
+  }
   HTempN.setValue(HTemp);  
 }
 
@@ -362,6 +371,8 @@ void buttonBoilerSwichCFunc(){
   if(BoilerPic)BoilerPic = false;
   else BoilerPic = true;
   EEPROM.put(BOILER_STATE_EE, BoilerPic);
+
+  JB.add("BoilerPic", String(BoilerPic));
   
   dbSerialPrint("Boiler Swich");
   dbSerialPrint(BoilerPic);
@@ -379,6 +390,7 @@ void buttonHeatingSwichCPushCallBack(void *ptr){ //HEATING ON OFF
 void buttonHeatingSwichCFunc(){
   HeatingPic = !HeatingPic;
   EEPROM.put(HEATING_STATE_EE, HeatingPic);
+  JB.add("HeatingPic", String(HeatingPic));
 //  Serial.print("PUTTING: ");
 //  Serial.println(HeatingPic); 
   
@@ -403,6 +415,7 @@ void buttonPriorityFunc(){
   if(Priority) Priority = false;
   else Priority = true;
   EEPROM.put(PRIORITY_EE, Priority);
+  JB.add("Priority", String(Priority));
 
   UpdateLogistics();
   
@@ -417,6 +430,7 @@ void buttonBTempUpPushCallBack(void *ptr){
   if(BTempSet < BTEMP_TOP){
     BTempSet++;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
+    JB.add("BTempSet", String(BTempSet));
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   } else {
@@ -432,6 +446,7 @@ void buttonBTempDownPushCallBack(void *ptr){
   if(BTempSet > BTEMP_BOTTOM){
     BTempSet--;
     EEPROM.put(BTEMP_SET_EE, BTempSet);
+    JB.add("BTempSet", String(BTempSet));
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   } else {
@@ -447,6 +462,7 @@ void buttonBHistUpPushCallBack(void *ptr){
   if(BHistSet < BTEMP_HIST_TOP){
     BHistSet++;
     EEPROM.put(BHIST_SET_EE, BHistSet);
+    JB.add("BHistSet", String(BHistSet));
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   } else {
@@ -461,6 +477,7 @@ void buttonBHistDownPushCallBack(void *ptr){
   if(BHistSet > BTEMP_HIST_BOTTOM){
     BHistSet--;
     EEPROM.put(BHIST_SET_EE, BHistSet);
+    JB.add("BHistSet", String(BHistSet));
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   } else {
@@ -474,6 +491,7 @@ void buttonHTempUpPushCallBack(void *ptr){
   if(HTempSet < HTEMP_TOP){
     HTempSet++;
     EEPROM.put(HTEMP_SET_EE, HTempSet);
+    JB.add("HTempSet", String(HTempSet));
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }else {
@@ -488,6 +506,7 @@ void buttonHTempDownPushCallBack(void *ptr){
   if(HTempSet > HTEMP_BOTTOM){
     HTempSet--;
     EEPROM.put(HTEMP_SET_EE, HTempSet);
+    JB.add("HTempSet", String(HTempSet));
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }else{
@@ -503,6 +522,7 @@ void buttonBoilerSourceKSwapFunc(){   //BOILER SOURCE
 
   BoilerSource = true;
   EEPROM.put(BOILER_SOURCE_EE, BoilerSource);
+  JB.add("BoilerSource", String(BoilerSource));
   UpdateLogistics();
   
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
@@ -520,6 +540,8 @@ void buttonBoilerSourceHSwapFunc(){    //BOILER SOURCE
 
   BoilerSource = false;
   EEPROM.put(BOILER_SOURCE_EE, BoilerSource);
+  JB.add("BoilerSource", String(BoilerSource));
+  
   UpdateLogistics();
   
   UpdateDoubleRelays(BoilerSource, BoilerState, RELAY1, RELAY2);
@@ -537,6 +559,7 @@ void buttonHeatingSourceKSwapFunc(){   //HEATING SOURCE
 
   HeatingSource = true;
   EEPROM.put(HEATING_SOURCE_EE, HeatingSource);
+  JB.add("HeatingSource", String(HeatingSource));
   
   UpdatePriority();
   
@@ -552,6 +575,7 @@ void buttonHeatingSourceHPSwapFunc(){    //HEATING SOURCE
 
   HeatingSource = false;
   EEPROM.put(HEATING_SOURCE_EE, HeatingSource);
+  JB.add("HeatingSource", String(HeatingSource));
   
   UpdatePriority();
   
@@ -568,6 +592,7 @@ void buttonPoolPumpFunc(){   //POOL PUMP ON OFF
   if(PoolPump)PoolPump = false;
   else PoolPump = true;
   EEPROM.put(POOL_PUMP_EE, PoolPump);
+  JB.add("PoolPump", String(PoolPump));
 
   UpdateSingleRelays(PoolPump, 1, RELAY6);
   UpdateSourceK();
@@ -585,6 +610,7 @@ void buttonFloorPumpFunc(){   //FLOOR PUMP ON OFF
   if(FloorPump)FloorPump = false;
   else FloorPump = true;
   EEPROM.put(FLOOR_PUMP_EE, FloorPump);
+  JB.add("FloorPump", String(FloorPump));
   
   UpdatePriority();
   
@@ -601,6 +627,7 @@ void buttonConvPumpFunc(){    //CONV PUMP ON OFF
   if(ConvPump)ConvPump = false;
   else ConvPump = true;
   EEPROM.put(CONV_PUMP_EE, ConvPump);
+  JB.add("ConvPump", String(ConvPump));
   
   UpdatePriority();
 
@@ -617,6 +644,7 @@ void buttonFloorConvPumpFunc(){   //FLOOR CONV PUMP ON OFF
   if(FloorConvPump)FloorConvPump = false;
   else FloorConvPump = true;
   EEPROM.put(FLOOR_CONV_PUMP_EE, FloorConvPump);
+  JB.add("FloorConvPump", String(FloorConvPump));
   
   UpdatePriority();
   
@@ -639,11 +667,11 @@ void buttonResetPushCallback(void *ptr){
 
 void parseValues(JsonArray&);
 
-void serialEvent3(){
-  if(Serial3.available()){
-    Serial.println(Serial.readString());
-  }
-}
+//void serialEvent3(){
+//  if(Serial3.available()){
+//    Serial.println(Serial.readString());
+//  }
+//}
 
 void serialEvent() {
   while (Serial.available()) {

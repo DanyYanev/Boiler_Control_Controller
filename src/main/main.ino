@@ -88,6 +88,8 @@ bool BCharge;
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 
  */
+JsonBuilder JB("12345", "token");
+ 
 OneWire BSensor(A0);
 OneWire HSensor(A1);
 
@@ -278,6 +280,7 @@ void setup() {
 unsigned long currentMillis = millis();
 unsigned long lastBoilerMillis = currentMillis;
 unsigned long lastHeatingMillis = currentMillis;
+unsigned long lastJBMillis = currentMillis;
 
 
 void loop() {
@@ -288,6 +291,15 @@ void loop() {
     TempUpdate();
 
     lastBoilerMillis = currentMillis;
+  }
+
+  if ((unsigned long)(currentMillis - lastJBMillis) >= 5000) {
+    if(JB.getAlternated()){
+      Serial.println(JB.getJson());
+      JB.flush();
+    }
+
+    lastJBMillis = currentMillis;
   }
 
 
