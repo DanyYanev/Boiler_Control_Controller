@@ -29,6 +29,7 @@
 #include <DallasTemperature.h>
 #include <ArduinoJson.h>
 
+#include "JsonBuilder.h"
 #include "Functions_Revision3.h"
 /*
  * DEFINE INPUTS/OUTPUTS 
