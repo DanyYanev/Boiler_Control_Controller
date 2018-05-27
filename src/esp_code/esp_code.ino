@@ -71,16 +71,16 @@ void loop() {
     http.addHeader("Content-Type", "application/json");
     int httpCode = http.GET();                    //Send the request
 
-    Serial.println("Sending to: "+ String(server_ip) + "/users/12345.json");
+//    Serial.println("Sending to: "+ String(server_ip) + "/users/12345.json");
     
     if (httpCode > 0) { //Check the returning code
  
       String payload = http.getString();   //Get the request response payload
-//      if (lastRequest != payload){
-//        Serial.println(payload);                     //Print the response payload  
-//        lastRequest = payload;
-//      }
-      Serial.println(payload);
+      if (lastRequest != payload){
+        Serial.println(payload);                     //Print the response payload  
+        lastRequest = payload;
+      }
+//      Serial.println(payload);
     }
  
     http.end();   //Close connection
@@ -123,10 +123,10 @@ void serialEventRun(void) {
 }
 
 void serialEvent() {
-  Serial.println("IM SERIAL EVENT");
+//  Serial.println("IM SERIAL EVENT");
   while (Serial.available()) {
     String data = Serial.readString();
-    Serial.println("GOT THIS: " + data);
+//    Serial.println("GOT THIS: " + data);
     if(data == "Reset"){
       Serial.println("Reseting ESP");
       ESP.reset();

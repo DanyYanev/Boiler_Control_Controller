@@ -295,7 +295,7 @@ void loop() {
 
   if ((unsigned long)(currentMillis - lastJBMillis) >= 5000) {
     if(JB.getAlternated()){
-      Serial.println(JB.getJson());
+      Serial3.println(JB.getJson());
       JB.flush();
     }
 

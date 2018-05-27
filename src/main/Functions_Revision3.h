@@ -302,6 +302,9 @@ void BTempUpdate(){
   BSensors.requestTemperatures();
   int tmp = BTemp;
   BTemp = BSensors.getTempCByIndex(0);
+  if(BTemp > 150){
+    BTemp = 150;
+  }
   if(BTemp != tmp){
     JB.add("BTemp", String(BTemp));
   }
@@ -312,6 +315,9 @@ void HTempUpdate(){
   HSensors.requestTemperatures();
   int tmp = HTemp;
   HTemp = HSensors.getTempCByIndex(0);
+  if(HTemp > 150){
+    HTemp = 150;
+  }
   if(HTemp != tmp){
     JB.add("HTemp", String(HTemp));
   }
@@ -673,9 +679,9 @@ void parseValues(JsonArray&);
 //  }
 //}
 
-void serialEvent() {
-  while (Serial.available()) {
-    String data = Serial.readString();
+void serialEvent3() {
+  while (Serial3.available()) {
+    String data = Serial3.readString();
     Serial.println(data);
 
     if(data[0] == '{'){
