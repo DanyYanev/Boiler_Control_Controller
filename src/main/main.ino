@@ -178,7 +178,6 @@ void setup() {
    /*
    *OUTPUT setup. 
    */
-
   pinMode(RESET_PIN, OUTPUT);
   
   pinMode(RELAY1, OUTPUT);
@@ -233,7 +232,7 @@ void setup() {
   HInMotion = 0;
 
   Serial.begin(115200);
-  Serial3.begin(115200);
+  Serial3.begin(9600);
   BSensors.begin();
   HSensors.begin();
 
@@ -296,6 +295,7 @@ void loop() {
   if ((unsigned long)(currentMillis - lastJBMillis) >= 5000) {
     if(JB.getAlternated()){
       Serial3.println(JB.getJson());
+//      Serial.println(JB.getJson());
       JB.flush();
     }
 

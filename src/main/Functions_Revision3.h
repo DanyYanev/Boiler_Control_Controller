@@ -681,6 +681,7 @@ void parseValues(JsonArray&);
 
 void serialEvent3() {
   while (Serial3.available()) {
+//    delay(150);
     String data = Serial3.readString();
     Serial.println(data);
 

@@ -5,6 +5,7 @@
 #include <DNSServer.h>
 #include <WiFiManager.h>
 #include <FS.h>
+#include <SoftwareSerial.h>
 
 #include <ArduinoJson.h>
 
@@ -21,9 +22,13 @@ const char* CONFIG_FILE = "/config.json";
 
 bool readConfigFile();
 bool writeConfigFile();
- 
+
+SoftwareSerial MySerial(D1, D0);
+
 void setup () {
-  Serial.begin(115200);
+  
+  Serial.begin(9600);
+  MySerial.begin(9600);
   Serial.println("IM AWAKE");
   SPIFFS.begin();
   
@@ -76,11 +81,11 @@ void loop() {
     if (httpCode > 0) { //Check the returning code
  
       String payload = http.getString();   //Get the request response payload
-      if (lastRequest != payload){
-        Serial.println(payload);                     //Print the response payload  
-        lastRequest = payload;
-      }
-//      Serial.println(payload);
+//      if (lastRequest != payload){
+//        Serial.println(payload);                     //Print the response payload  
+//        lastRequest = payload;
+//      }
+      Serial.println(payload);
     }
  
     http.end();   //Close connection
@@ -119,13 +124,12 @@ void configurePortal(){
 }
 
 void serialEventRun(void) {
-  if (Serial.available()) serialEvent();
+  if (MySerial.available()) serialEvent();
 }
 
 void serialEvent() {
-//  Serial.println("IM SERIAL EVENT");
-  while (Serial.available()) {
-    String data = Serial.readString();
+  while (MySerial.available()) {
+    String data = MySerial.readString();
 //    Serial.println("GOT THIS: " + data);
     if(data == "Reset"){
       Serial.println("Reseting ESP");
@@ -137,13 +141,13 @@ void serialEvent() {
     } else {
       //Send json to server
       HTTPClient http;
-      http.begin(String(server_ip) + "/users/12345");
+      http.begin(String(server_ip) + "/users/12345.json");
       http.addHeader("Content-Type", "application/json");
       
       int httpCode = http.PUT(data);
       if (httpCode == 200) { //Check the returning code
         Serial.println("Data update successfull");
-        delay(1000);
+//        delay(1000);
       }
       Serial.println(data);
     }
@@ -205,53 +209,3 @@ bool writeConfigFile(){
   Serial.println("\nConfig file was successfully saved");
   return true;
 }
-
-//    StaticJsonBuffer<200> jsonBuffer;
-//    JsonObject& root = jsonBuffer.createObject();
-//
-//    root["uid"] = uid;
-//    root["room"] = room;
-//
-//    char jsonBody[100];
-//    root.printTo(jsonBody, root.measureLength() + 1);
-//    Serial.println(jsonBody);
-//    
-//    HTTPClient http;
-// 
-//    http.begin(server_ip);
-//    http.addHeader("Content-Type", "application/json");
-//    
-//    int httpCode = http.POST(String(jsonBody));
-//    Serial.print("HTTP request send to: ");
-//    Serial.println(server_ip);
-//    if (httpCode == 200) { //Check the returning code
-//      Serial.println("JSON Parsed succccsessfully");
-//      digitalWrite(GREEN_LED_PIN, HIGH);
-//      delay(1000);
-//      digitalWrite(GREEN_LED_PIN, LOW);
-//    } else if(httpCode == 401){
-//      Serial.println("No such database entry");
-//      tone(BUZZER_PIN, 800);
-//      delay(1000);
-//      noTone(BUZZER_PIN);
-//    }else{
-//      tone(BUZZER_PIN, 800);
-//      delay(500);
-//      noTone(BUZZER_PIN);
-//      delay(200);
-//      tone(BUZZER_PIN, 800);
-//      delay(500);
-//      noTone(BUZZER_PIN);
-//      delay(200);
-//      tone(BUZZER_PIN, 800);
-//      delay(500);
-//      noTone(BUZZER_PIN);
-//    }
-// 
-//    http.end();   //Close connection
-//    rfid.PICC_HaltA();
-//
-//    // Stop encryption on PCD
-//    rfid.PCD_StopCrypto1(); 
-//  }
-  
