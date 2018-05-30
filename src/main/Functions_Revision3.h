@@ -154,11 +154,9 @@ void UpdateSingleRelays(bool state, bool master, int relay1){  //Update Relay Fu
   if(master){
     if(state == true){
       digitalWrite(relay1, LOW);
-      //Serial.println("RELAY6 ON");
     }
     if(state == false){
       digitalWrite(relay1, HIGH);
-      //Serial.println("RELAY6 OFF");
     }
   } else {
     digitalWrite(relay1, HIGH);
@@ -667,8 +665,7 @@ void buttonResetPushCallback(void *ptr){
   Serial.println("Reseting");
   Serial3.println("Reset");
   digitalWrite(RESET_PIN, LOW);
-//  delay(10);
-//  digitalWrite(RESET_PIN, HIGH);
+  delay(5000);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -711,7 +708,7 @@ void serialEvent3() {
       
     } else if (data == "OK" || data == "OK\n"){
       JB.setAlternated(false);
-//      Serial.println("Got confirmation");
+//      Serial.println("Update successfull");
     } else {
       if(data[0] == 'M' && data[1] == ':'){
         Serial.print(data);
