@@ -11,6 +11,7 @@ class JsonBuilder{
         bool getAlternated();
         String getJson();
         void flush();
+        void setAlternated(bool);
 
     private:
         bool alternated;

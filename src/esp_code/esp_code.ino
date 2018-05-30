@@ -137,6 +137,8 @@ void serialEvent() {
       int httpCode = http.PUT(data);
       if (httpCode != 200) { //Check the returning code
         Serial.println("M: Something went wrong: " + httpCode);
+      } else {
+        Serial.print("OK");
       }
     } else {
       Serial.print("M: No match for: " + data);

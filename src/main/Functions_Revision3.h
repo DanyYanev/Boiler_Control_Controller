@@ -709,6 +709,9 @@ void serialEvent3() {
         Serial3.print("OK");
       }
       
+    } else if (data == "OK" || data == "OK\n"){
+      JB.setAlternated(false);
+//      Serial.println("Got confirmation");
     } else {
       if(data[0] == 'M' && data[1] == ':'){
         Serial.print(data);

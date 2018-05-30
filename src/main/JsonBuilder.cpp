@@ -48,3 +48,8 @@ String JsonBuilder::getJson(){
 bool JsonBuilder::getAlternated(){
     return alternated;
 }
+
+void JsonBuilder::setAlternated(bool status){
+  alternated = status;
+}
+
