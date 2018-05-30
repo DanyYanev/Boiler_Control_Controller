@@ -49,6 +49,8 @@
 #define BTEMP_HIST_BOTTOM 2
 #define HTEMP_TOP 40
 #define HTEMP_BOTTOM 30
+
+#define JSON_STATIC_BUFFER_SIZE 550
  
 extern int RELAY1;
 extern int RELAY2;
@@ -673,32 +675,27 @@ void buttonResetPushCallback(void *ptr){
 
 void parseValues(JsonArray&);
 
-//void serialEvent3(){
-//  if(Serial3.available()){
-//    Serial.println(Serial.readString());
-//  }
-//}
+void serialEvent() {
+   while (Serial.available()) {
+      Serial3.print(Serial.readString());
+      delay(50);  
+   }
+}
 
 void serialEvent3() {
   while (Serial3.available()) {
-//    delay(150);
     String data = Serial3.readString();
-    Serial.println(data);
-
+    
     if(data[0] == '{'){
-      Serial.println("We got data wohoo");
+      StaticJsonBuffer<JSON_STATIC_BUFFER_SIZE> jsonBuffer;
+      char jsonbuff[JSON_STATIC_BUFFER_SIZE];
 
-      StaticJsonBuffer<500> jsonBuffer;
-
-      char jsonbuff[500];
-
-      data.toCharArray(jsonbuff, 500);
+      data.toCharArray(jsonbuff, JSON_STATIC_BUFFER_SIZE);
 
       JsonObject& root = jsonBuffer.parseObject(jsonbuff);
       
-      // Test if parsing succeeds.
       if (!root.success()) {
-        Serial.println("parseObject() failed");
+        Serial.print("parseObject() failed for: \n" + data);
         return;
       }
     
@@ -707,12 +704,18 @@ void serialEvent3() {
         Serial.println("Wrong token");
       }
       
-//      JsonArray& value_objects = root["value_objects_attributes"];
+      if(!JB.getAlternated()){ //If there are local changes do not update
+        parseValues(root["values_attributes"]);
+        Serial3.print("OK");
+      }
       
-      parseValues(root["values_attributes"]);
-      
+    } else {
+      if(data[0] == 'M' && data[1] == ':'){
+        Serial.print(data);
+      }else {
+        Serial.print("No match for:\n " + data);
+      }
     }
-
     
   }
 }

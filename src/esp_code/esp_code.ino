@@ -15,8 +15,7 @@ int lastCheck = 0;
 String server_ip;
 
 String lastRequest = "";
-
-//const int TRIGGER_PIN = D3;
+String lastAcceptedRequest = "";
 
 const char* CONFIG_FILE = "/config.json";
 
@@ -29,26 +28,15 @@ void setup () {
   
   Serial.begin(9600);
   MySerial.begin(9600);
-  Serial.println("IM AWAKE");
   SPIFFS.begin();
   
   if (!readConfigFile()) {
-    Serial.println("Failed to read configuration file, using default values");
-    if(SPIFFS.format()){
-      Serial.println("Format passed");
-      File f = SPIFFS.open(CONFIG_FILE, "w");
-      if (!f) {
-        Serial.println("Failed to open config file for writing");
-        configurePortal();
-      } else f.close();
-    } else {
-      Serial.println("Format failed");
-    }
+    Serial.println("M:Failed to open config file for writing");
   } else {
     WiFi.printDiag(Serial);
     WiFi.mode(WIFI_STA); 
     unsigned long startedAt = millis();
-    Serial.print("After waiting ");
+    Serial.print("M:After waiting ");
     int connRes = WiFi.waitForConnectResult();
     float waited = (millis()- startedAt);
     Serial.print(waited/1000);
@@ -57,10 +45,10 @@ void setup () {
   }
 
   if (WiFi.status()!= WL_CONNECTED){
-    Serial.println("Failed to connect, finishing setup anyway");
+    Serial.println("M:Failed to connect, finishing setup anyway");
     configurePortal();
   } else{
-    Serial.print("Local ip: ");
+    Serial.print("M:Local ip: ");
     Serial.println(WiFi.localIP());
   }
  
@@ -70,22 +58,21 @@ void loop() {
  if (WiFi.status() == WL_CONNECTED && (millis() - lastCheck > TIMEOUT_)) { //Check WiFi connection status
  
     HTTPClient http;
- 
-//    http.begin("http://192.168.1.127:3000/users/12345.json");  //Specify request destination
+
     http.begin(String(server_ip) + "/users/12345.json");
     http.addHeader("Content-Type", "application/json");
     int httpCode = http.GET();                    //Send the request
 
-//    Serial.println("Sending to: "+ String(server_ip) + "/users/12345.json");
-    
     if (httpCode > 0) { //Check the returning code
- 
-      String payload = http.getString();   //Get the request response payload
-//      if (lastRequest != payload){
-//        Serial.println(payload);                     //Print the response payload  
-//        lastRequest = payload;
-//      }
-      Serial.println(payload);
+      if(httpCode == 200){
+        String payload = http.getString();
+        if (lastAcceptedRequest != payload){
+           Serial.println(payload);
+          lastRequest = payload;
+        }
+      } else {
+        Serial.println("M: Something went wrong: " + httpCode);
+      }    
     }
  
     http.end();   //Close connection
@@ -97,7 +84,7 @@ void loop() {
 }
 
 void configurePortal(){
-    Serial.println("Configuration portal requested");
+    Serial.println("M:Configuration portal requested");
     
     char convertedValue[4];
     
@@ -109,9 +96,9 @@ void configurePortal(){
     wifiManager.addParameter(&p_server_ip);
 
     if (!wifiManager.startConfigPortal()) {
-      Serial.println("Not connected to WiFi but continuing anyway.");
+      Serial.println("M:Not connected to WiFi but continuing anyway.");
     } else {
-      Serial.println("Connected...yeey  :)");
+      Serial.println("M:Connected...yeey  :)");
     }
     
     server_ip = String(p_server_ip.getValue());
@@ -130,26 +117,29 @@ void serialEventRun(void) {
 void serialEvent() {
   while (MySerial.available()) {
     String data = MySerial.readString();
-//    Serial.println("GOT THIS: " + data);
+
     if(data == "Reset"){
-      Serial.println("Reseting ESP");
+      Serial.println("M:Reseting ESP");
       ESP.reset();
       delay(5000);
     } else if(data == "conf" || data == "conf\n"){
-      Serial.println("Configurating portal");
+      Serial.println("M:Configurating portal");
       configurePortal();
-    } else {
+    } else if(data == "OK" || data == "OK\n"){
+//      Serial.println("M:Confirmed");
+      lastAcceptedRequest = lastRequest;
+    } else if(data[0] == '{'){
       //Send json to server
       HTTPClient http;
       http.begin(String(server_ip) + "/users/12345.json");
       http.addHeader("Content-Type", "application/json");
       
       int httpCode = http.PUT(data);
-      if (httpCode == 200) { //Check the returning code
-        Serial.println("Data update successfull");
-//        delay(1000);
+      if (httpCode != 200) { //Check the returning code
+        Serial.println("M: Something went wrong: " + httpCode);
       }
-      Serial.println(data);
+    } else {
+      Serial.print("M: No match for: " + data);
     }
   }
 }
