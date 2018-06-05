@@ -27,7 +27,9 @@
 #include <NexWaveform.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <ArduinoJson.h>
 
+#include "JsonBuilder.h"
 #include "Functions_Revision3.h"
 /*
  * DEFINE INPUTS/OUTPUTS 
@@ -86,6 +88,8 @@ bool BCharge;
 /*
  * DECLARE NEXTION objects [page id:0,component id:1, component name: "q0"]. 
  */
+JsonBuilder JB("12345", "token");
+ 
 OneWire BSensor(A0);
 OneWire HSensor(A1);
 
@@ -174,7 +178,6 @@ void setup() {
    /*
    *OUTPUT setup. 
    */
-
   pinMode(RESET_PIN, OUTPUT);
   
   pinMode(RELAY1, OUTPUT);
@@ -229,7 +232,7 @@ void setup() {
   HInMotion = 0;
 
   Serial.begin(115200);
-  Serial3.begin(115200);
+  Serial3.begin(9600);
   BSensors.begin();
   HSensors.begin();
 
@@ -276,15 +279,25 @@ void setup() {
 unsigned long currentMillis = millis();
 unsigned long lastBoilerMillis = currentMillis;
 unsigned long lastHeatingMillis = currentMillis;
+unsigned long lastJBMillis = currentMillis;
+
 
 void loop() {
 
   currentMillis = millis();
-  
+
   if ((unsigned long)(currentMillis - lastBoilerMillis) >= 60000) { //every minute 60000 = 60s
     TempUpdate();
 
     lastBoilerMillis = currentMillis;
+  }
+
+  if ((unsigned long)(currentMillis - lastJBMillis) >= 5000) {
+    if(JB.getAlternated()){
+      Serial3.println(JB.getJson());
+    }
+
+    lastJBMillis = currentMillis;
   }
 
 
@@ -295,14 +308,7 @@ void loop() {
   }
 
   nexLoop(nex_listen_list);
-  
+
 }
 
-void serialEvent3() {
-  while (Serial3.available()) {
-  String data = Serial3.readString();
-  Serial.print(data);
-  }
-}
-  
 
