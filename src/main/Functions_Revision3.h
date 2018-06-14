@@ -708,6 +708,7 @@ void serialEvent3() {
       
     } else if (data == "OK" || data == "OK\n"){
       JB.setAlternated(false);
+      JB.flush();
 //      Serial.println("Update successfull");
     } else {
       if(data[0] == 'M' && data[1] == ':'){
@@ -799,6 +800,20 @@ void parseValues(JsonArray& valueObjects){
         }
         EEPROM.put(HTEMP_SET_EE, HTempSet);
         HTempSetN.setValue(HTempSet);
+        UpdateLogistics();
+      }
+    } else if(strcmp("BHistSet", value_object["key"].as<const char*>()) == 0){
+      int target = atoi(value_object["value"].as<const char*>());
+      if(BHistSet != target){
+        if(target > BTEMP_HIST_BOTTOM && target < BTEMP_HIST_TOP){
+          BHistSet = target;
+        }else if(target <= BTEMP_HIST_BOTTOM){
+          BHistSet = BTEMP_HIST_BOTTOM;
+        } else if(target >= BTEMP_HIST_TOP){
+          BHistSet = BTEMP_HIST_TOP;
+        }
+        EEPROM.put(HTEMP_SET_EE, BHistSet);
+        BHistSetN.setValue(BHistSet);
         UpdateLogistics();
       }
     }
