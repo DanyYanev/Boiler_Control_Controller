@@ -1,6 +1,4 @@
 # Boiler_Control_Controller
-## EVERYTHING IS ON BRANCH ESP
-
 
 ## Assignment 
  
@@ -15,7 +13,7 @@ It’s especially useful when manging the heating system of a distanced house in
 
 ## General Working Schema
 
-<img src="https://github.com/DanyYanev/Boiler_Control_Controller/blob/esp/resourses/Simple%20logical%20schema.png" width="70%">
+<img src="https://github.com/DanyYanev/Boiler_Control_Controller/blob/master/resourses/Simple%20logical%20schema.png" width="70%">
 
   The whole system water-heating system is controlled by an Arduino Mega that communicates with an ESP8266 Module, the GUI is a [Nextion Display](https://nextion.itead.cc/) which is getting programmed through the Nextion Editor. All pictures were designed using Adobe Photoshop and are located in [here](/resourses/pictures/).
 
