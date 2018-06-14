@@ -443,11 +443,6 @@ void buttonBTempUpPushCallBack(void *ptr){
     BTempSet = BTEMP_TOP;
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
-  } else {
-    BTempSet = 75;
-//    EEPROM.put(BTEMP_SET_EE, BTempSet);
-    BTempSetN.setValue(BTempSet);
-    UpdateLogistics();
   }
 }
 
@@ -462,11 +457,6 @@ void buttonBTempDownPushCallBack(void *ptr){
     UpdateLogistics();
   } else {
     BTempSet = BTEMP_BOTTOM;
-    BTempSetN.setValue(BTempSet);
-    UpdateLogistics();
-  } else {
-    BTempSet = 65;
-    //EEPROM.put(BTEMP_SET_EE, BTempSet);
     BTempSetN.setValue(BTempSet);
     UpdateLogistics();
   }
@@ -485,11 +475,6 @@ void buttonBHistUpPushCallBack(void *ptr){
     BHistSet = BTEMP_HIST_TOP;
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
-  } else {
-    BHistSet = 15;
-    //EEPROM.put(BHIST_SET_EE, BHistSet);
-    BHistSetN.setValue(BHistSet);
-    UpdateLogistics();
   }
 }
   
@@ -503,11 +488,6 @@ void buttonBHistDownPushCallBack(void *ptr){
     UpdateLogistics();
   } else {
     BHistSet = BTEMP_HIST_BOTTOM;
-    BHistSetN.setValue(BHistSet);
-    UpdateLogistics();
-  } else {
-    BHistSet = 2;
-    //EEPROM.put(BHIST_SET_EE, BHistSet);
     BHistSetN.setValue(BHistSet);
     UpdateLogistics();
   }
@@ -524,11 +504,6 @@ void buttonHTempUpPushCallBack(void *ptr){
     HTempSet = HTEMP_TOP;
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
-  }else {
-    HTempSet = 40;
-    //EEPROM.put(HTEMP_SET_EE, HTempSet);
-    HTempSetN.setValue(HTempSet);
-    UpdateLogistics();
   }
 }
 
@@ -542,11 +517,6 @@ void buttonHTempDownPushCallBack(void *ptr){
     UpdateLogistics();
   }else{
     HTempSet = HTEMP_BOTTOM;
-    HTempSetN.setValue(HTempSet);
-    UpdateLogistics();
-  }else{
-    HTempSet = 30;
-    //EEPROM.put(HTEMP_SET_EE, HTempSet);
     HTempSetN.setValue(HTempSet);
     UpdateLogistics();
   }
@@ -618,14 +588,6 @@ void buttonHeatingSourceHPSwapFunc(){    //HEATING SOURCE
   Pic_Update(HeatingSource, buttonHeatingSource, 8, 5);
 }
 
-void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
-  buttonPoolPumpFunc();
-}
-
-void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
-  buttonHeatingSourceHPSwapFunc();
-}
-
 void buttonPoolPumpFunc(){   //POOL PUMP ON OFF
   dbSerialPrintln("PoolPumpPopCallback");
   
@@ -643,6 +605,10 @@ void buttonPoolPumpPushCallback(void *ptr){   //POOL PUMP ON OFF
   buttonPoolPumpFunc();
 }
 
+void buttonHeatingSourceHPSwapPushCallBack(void *ptr){    //HEATING SOURCE
+  buttonHeatingSourceHPSwapFunc();
+}
+
 void buttonFloorPumpFunc(){   //FLOOR PUMP ON OFF
   dbSerialPrintln("FloorPumpPopCallback");
   
@@ -654,14 +620,6 @@ void buttonFloorPumpFunc(){   //FLOOR PUMP ON OFF
   UpdatePriority();
   
   Pic_Update(FloorPump, buttonFloorPump, 8, 5);
-}
-
-void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
-  buttonConvPumpFunc();
-}	
-
-void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
-  buttonFloorPumpFunc();
 }
 
 void buttonConvPumpFunc(){    //CONV PUMP ON OFF
@@ -677,12 +635,12 @@ void buttonConvPumpFunc(){    //CONV PUMP ON OFF
   Pic_Update(ConvPump, buttonConvPump, 8, 5);
 }
 
-void buttonFloorConvPumpPushCallback(void *ptr){   //FLOOR CONV PUMP ON OFF
-  buttonFloorConvPumpFunc();
-}
-
 void buttonConvPumpPushCallback(void *ptr){    //CONV PUMP ON OFF
   buttonConvPumpFunc();
+}	
+
+void buttonFloorPumpPushCallback(void *ptr){   //FLOOR PUMP ON OFF
+  buttonFloorPumpFunc();
 }
 
 void buttonFloorConvPumpFunc(){   //FLOOR CONV PUMP ON OFF
@@ -859,4 +817,3 @@ void parseValues(JsonArray& valueObjects){
     }
   }
 }
->>>>>>> esp
