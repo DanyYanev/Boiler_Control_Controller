@@ -1,5 +1,9 @@
 # Boiler_Control_Controller
 
+## Awards
+
+Business choice award from <b>TelebidPro</b> at <b>TUES FEST</b>
+
 ## Assignment 
  
 Developing an easy-to-use device for controlling complicated water-heating systems through relays, giving the end user the ability to easily manage the heating system by the provided local touchscreen display, or remotely done so by the developed mobile Android application.
